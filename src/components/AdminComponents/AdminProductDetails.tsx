@@ -10,6 +10,9 @@ interface AdminProductDetailProps {
   onBack: () => void;
 }
 
+
+
+
 /* ---------------------- Helper Function ---------------------- */
 const renderFieldCard = (
   label: string,
@@ -235,7 +238,7 @@ const AdminProductDetail: React.FC<AdminProductDetailProps> = ({
                   QA Details
                 </h4>
 
-                {Array.isArray(mat.qa_details) && mat.qa_details.length > 0 ? (
+                {/* {Array.isArray(mat.qa_details) && mat.qa_details.length > 0 ? (
                   <table className="w-full border-collapse text-sm text-center rounded-xl overflow-hidden border">
                     <thead className="bg-gray-100 text-gray-700 font-semibold">
                       <tr>
@@ -244,9 +247,9 @@ const AdminProductDetail: React.FC<AdminProductDetailProps> = ({
                         <th className="border px-2 py-1">No. of Sheets</th>
                         <th className="border px-2 py-1">Cycle Time/Sheet</th>
                         <th className="border px-2 py-1">Total Cycle Time</th>
-                        <th className="border px-2 py-1">Operator Name</th>
+                     
                         <th className="border px-2 py-1">Created By</th>
-                        <th className="border px-2 py-1">Machines Used / Time</th>
+                     
                       </tr>
                     </thead>
                     <tbody>
@@ -257,10 +260,10 @@ const AdminProductDetail: React.FC<AdminProductDetailProps> = ({
                           <td className="border px-2 py-2">{qa.no_of_sheets}</td>
                           <td className="border px-2 py-2">{qa.cycletime_per_sheet}</td>
                           <td className="border px-2 py-2">{qa.total_cycle_time}</td>
-                          <td className="border px-2 py-2">{qa.operator_name}</td>
+                     
                           <td className="border px-2 py-2">{qa.created_by__username}</td>
 
-                          {/* machines list */}
+                       
                           <td className="border px-2 py-2">
                             {Array.isArray(qa.machines_used) &&
                               qa.machines_used.length > 0 ? (
@@ -282,11 +285,86 @@ const AdminProductDetail: React.FC<AdminProductDetailProps> = ({
                         </tr>
                       ))}
                     </tbody>
+                  </table> */}
+                {/* ) : (
+                   <p className="text-gray-500 italic">No QA details available.</p>
+                )} */}
+
+                {Array.isArray(mat.qa_details) && mat.qa_details.length > 0 ? (
+  <>
+    <table className="w-full border-collapse text-sm text-center rounded-xl overflow-hidden border">
+      <thead className="bg-gray-100 text-gray-700 font-semibold">
+        <tr>
+          <th className="border px-2 py-1">Processed Date</th>
+          <th className="border px-2 py-1">Shift</th>
+          <th className="border px-2 py-1">Sheets</th>
+          <th className="border px-2 py-1">Cycle/Sheet</th>
+          <th className="border px-2 py-1">Total Cycle</th>
+          <th className="border px-2 py-1">Created By</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {mat.qa_details.map((qa, i) => (
+          <React.Fragment key={i}>
+            {/* QA Main Row */}
+            <tr>
+              <td className="border px-2 py-2">{qa.processed_date}</td>
+              <td className="border px-2 py-2">{qa.shift}</td>
+              <td className="border px-2 py-2">{qa.no_of_sheets}</td>
+              <td className="border px-2 py-2">{qa.cycletime_per_sheet}</td>
+              <td className="border px-2 py-2">{qa.total_cycle_time}</td>
+              <td className="border px-2 py-2">{qa.created_by__username}</td>
+            </tr>
+
+            {/* Machines Row (Full Width) */}
+            <tr>
+              <td colSpan={6} className="border px-2 py-2 bg-gray-50">
+                {/* {qa.machines_used.length > 0 ? ( */}
+                {Array.isArray(qa.machines_used) && qa.machines_used.length > 0 ? (
+
+                  <table className="w-full border-collapse text-sm">
+                    <thead>
+                      <tr className="bg-slate-200 text-center">
+                        <th className="px-2 py-2 border">Machine</th>
+                        <th className="px-2 py-2 border">Date</th>
+                        <th className="px-2 py-2 border">Start</th>
+                        <th className="px-2 py-2 border">End</th>
+                        <th className="px-2 py-2 border">Runtime</th>
+                        <th className="px-2 py-2 border">Operator</th>
+                        <th className="px-2 py-2 border">Air</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      {qa.machines_used.map((m, idx) => (
+                        <tr key={idx}>
+                          <td className="border px-2 py-1">{m.machine}</td>
+                          <td className="border px-2 py-1">{m.date}</td>
+                          <td className="border px-2 py-1">{m.start}</td>
+                          <td className="border px-2 py-1">{m.end}</td>
+                          <td className="border px-2 py-1">{m.runtime}</td>
+                          <td className="border px-2 py-1">{m.operator}</td>
+                          <td className="border px-2 py-1">{m.air || "—"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
                   </table>
                 ) : (
-                  <p className="text-gray-500 italic">No QA details available.</p>
+                  <span className="italic text-gray-500">No Machines</span>
                 )}
-              </section>
+              </td>
+            </tr>
+          </React.Fragment>
+        ))}
+      </tbody>
+    </table>
+  </>
+) : (
+  <p className="text-gray-500 italic">No QA details available.</p>
+)}
+
+               </section>
 
               {/* Account Details */}
               <section>

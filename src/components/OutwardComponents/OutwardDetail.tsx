@@ -34,8 +34,15 @@ interface QaDetail {
   no_of_sheets: number;
   cycletime_per_sheet: number;
   total_cycle_time: number;
-  machines_used: { machine: string; time: string }[];
-  operator_name: string;
+  machines_used: {
+    machine: string;
+    date: string;
+    start: string;
+    end: string;
+    runtime: string;
+    air: string;
+    operator: string;
+  }[];
   product_id: number;
   material_id: number;
   created_by: string;
@@ -74,8 +81,9 @@ const renderFieldCard = (
 
   return (
     <Card
-      className={`shadow-sm rounded-lg border ${isStatus ? 'border-transparent' : 'border-gray-200'
-        }`}
+      className={`shadow-sm rounded-lg border ${
+        isStatus ? 'border-transparent' : 'border-gray-200'
+      }`}
     >
       <CardContent className='p-4'>
         <span className='text-gray-500 font-medium text-sm'>{label}</span>
@@ -262,7 +270,7 @@ const OutwardDetail: React.FC<OutwardDetailProps> = ({ product }) => {
               <thead className='bg-gray-100 text-gray-700 font-semibold w-full'>
                 <tr>
                   <th className='border px-1 py-1'>S.No</th>
-		  <th className='border px-1 py-1'>Bay</th>
+                  <th className='border px-1 py-1'>Bay</th>
                   <th className='border px-1 py-1'>Material Type</th>
                   <th className='border px-1 py-1'>Grade</th>
                   <th className='border px-1 py-1'>Thick (mm)</th>
@@ -285,19 +293,25 @@ const OutwardDetail: React.FC<OutwardDetailProps> = ({ product }) => {
                     key={mat.id || index}
                     className='hover:bg-gray-50 transition text-gray-800'
                   >
-                    <td className='border px-2 py-2 font-medium'>{index + 1}</td>
-		    <td className='border px-2 py-2'>{mat.bay}</td>
+                    <td className='border px-2 py-2 font-medium'>
+                      {index + 1}
+                    </td>
+                    <td className='border px-2 py-2'>{mat.bay}</td>
                     <td className='border px-2 py-2'>{mat.mat_type}</td>
                     <td className='border px-2 py-2'>{mat.mat_grade}</td>
                     <td className='border px-2 py-2'>{mat.thick}</td>
                     <td className='border px-2 py-2'>{mat.width}</td>
                     <td className='border px-2 py-2'>{mat.length}</td>
                     <td className='border px-2 py-2'>{mat.density}</td>
-                    <td className='border px-2 py-2'>{Number(mat.unit_weight).toFixed(2)}</td>
+                    <td className='border px-2 py-2'>
+                      {Number(mat.unit_weight).toFixed(2)}
+                    </td>
                     <td className='border px-2 py-2'>{mat.quantity}</td>
-                    <td className='border px-2 py-2'>{Number(mat.total_weight).toFixed(2)}</td>
+                    <td className='border px-2 py-2'>
+                      {Number(mat.total_weight).toFixed(2)}
+                    </td>
                     <td className='border px-2 py-2'>{mat.stock_due}</td>
-                    <td className='border px-2 py-2'>{mat.remarks || "--"}</td>
+                    <td className='border px-2 py-2'>{mat.remarks || '--'}</td>
                     {mat.programer_status === 'completed' && mat.id && (
                       <td className='border px-2 py-2'>
                         <Button
@@ -308,8 +322,8 @@ const OutwardDetail: React.FC<OutwardDetailProps> = ({ product }) => {
                           {loadingID === mat.id
                             ? 'Loading...'
                             : selectedMaterialId === mat.id
-                              ? 'Hide'
-                              : 'View'}
+                            ? 'Hide'
+                            : 'View'}
                         </Button>
                       </td>
                     )}
@@ -357,7 +371,7 @@ const OutwardDetail: React.FC<OutwardDetailProps> = ({ product }) => {
       {/* QA Section (filtered per material) */}
       {selectedMaterialId && selectedMaterialQaDetails.length > 0 ? (
         <>
-          <section className="mt-10">
+          <section className='mt-10'>
             <h3 className='text-xl font-semibold text-gray-700 mb-6'>
               QA Details (Material #{selectedMaterialId})
             </h3>
@@ -370,9 +384,8 @@ const OutwardDetail: React.FC<OutwardDetailProps> = ({ product }) => {
                     <th className='border px-2 py-1'>No. of Sheets</th>
                     <th className='border px-2 py-1'>Cycle Time/Sheet</th>
                     <th className='border px-2 py-1'>Total Cycle Time</th>
-                    <th className='border px-2 py-1'>Operator Name</th>
                     <th className='border px-2 py-1'>Created By</th>
-                    <th className='border px-2 py-1'>Machines Used / Time</th>
+                    {/* <th className='border px-2 py-1 w-full'>Machines Used / Time</th> */}
                   </tr>
                 </thead>
 
@@ -385,13 +398,16 @@ const OutwardDetail: React.FC<OutwardDetailProps> = ({ product }) => {
                       <td className='border px-2 py-2'>{qa.processed_date}</td>
                       <td className='border px-2 py-2'>{qa.shift}</td>
                       <td className='border px-2 py-2'>{qa.no_of_sheets}</td>
-                      <td className='border px-2 py-2'>{qa.cycletime_per_sheet}</td>
-                      <td className='border px-2 py-2'>{qa.total_cycle_time}</td>
-                      <td className='border px-2 py-2'>{qa.operator_name}</td>
+                      <td className='border px-2 py-2'>
+                        {qa.cycletime_per_sheet}
+                      </td>
+                      <td className='border px-2 py-2'>
+                        {qa.total_cycle_time}
+                      </td>
                       <td className='border px-2 py-2'>{qa.created_by}</td>
 
                       {/* Machines used */}
-                      <td className='border px-2 py-2'>
+                      {/* <td className='border px-2 py-2'>
                         {qa.machines_used?.length > 0 ? (
                           <ul className='space-y-1 text-left'>
                             {qa.machines_used.map((m, idx) => (
@@ -400,7 +416,13 @@ const OutwardDetail: React.FC<OutwardDetailProps> = ({ product }) => {
                                 className='flex justify-between bg-gray-100 px-2 py-1 rounded'
                               >
                                 <span className='font-medium'>{m.machine}</span>
-                                <span>{m.time} Mins</span>
+                                <span className='border'>{m.date} date</span>
+                                <span className='border'>{m.start}start</span>
+                                <span className='border'>{m.end}end</span>
+                                <span className='border'>{m.runtime}Runtime</span>
+                                <span className='border'>{m.air}Air</span>
+                                <span className='border'>{m.operator}Operator</span>
+                             
                               </li>
                             ))}
                           </ul>
@@ -409,13 +431,55 @@ const OutwardDetail: React.FC<OutwardDetailProps> = ({ product }) => {
                             No machines
                           </span>
                         )}
-                      </td>
+                      </td> */}
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           </section>
+
+          <tbody>
+            {selectedMaterialQaDetails.map((qa) => (
+              <React.Fragment key={qa.id}>
+                <tr className='hover:bg-gray-50 text-gray-800 w-full'>
+                 
+                  <td className='border px-2 py-2 w-full'>
+                    {qa.machines_used.length > 0 ? (
+                      <table className='w-full border-collapse text-sm'>
+                        <thead>
+                          <tr className='bg-slate-100 text-center'>
+                            <th className='px-2 py-2'>Machine</th>
+                            <th className='px-2 py-2'>Date</th>
+                            <th className='px-2 py-2'>Start</th>
+                            <th className='px-2 py-2'>End</th>
+                            <th className='px-2 py-2'>Runtime</th>
+                            <th className='px-2 py-2'>Operator</th>
+                            <th className='px-2 py-2'>Air</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {qa.machines_used.map((m, idx) => (
+                            <tr key={idx}>
+                              <td className='border px-16'>{m.machine}</td>
+                              <td className='border px-16'>{m.date}</td>
+                              <td className='border px-16'>{m.start}</td>
+                              <td className='border px-16'>{m.end}</td>
+                              <td className='border px-16'>{m.runtime}</td>
+                              <td className='border px-16'>{m.operator}</td>
+                              <td className='border px-16'>{m.air || '—'}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    ) : (
+                      <span className='text-gray-500 italic'>No Machines</span>
+                    )}
+                  </td>
+                </tr>
+              </React.Fragment>
+            ))}
+          </tbody>
         </>
       ) : (
         selectedMaterialId && (
@@ -427,30 +491,30 @@ const OutwardDetail: React.FC<OutwardDetailProps> = ({ product }) => {
 
       {selectedMaterialId && selectedMaterialAccDetails.length > 0 ? (
         <>
-          <Separator className="my-10" />
+          <Separator className='my-10' />
 
-          <h3 className="text-xl font-semibold text-gray-700 mb-6">
+          <h3 className='text-xl font-semibold text-gray-700 mb-6'>
             Account Details
           </h3>
 
-          <div className="overflow-x-auto rounded-xl border">
-            <table className="min-w-full border-collapse text-sm">
+          <div className='overflow-x-auto rounded-xl border'>
+            <table className='min-w-full border-collapse text-sm'>
               <thead>
-                <tr className="bg-gray-100 text-left text-gray-700">
-                  <th className="px-4 py-3 border">Invoice No</th>
-                  <th className="px-4 py-3 border">Status</th>
-                  <th className="px-4 py-3 border">Remarks</th>
-                  <th className="px-4 py-3 border">Created By</th>
+                <tr className='bg-gray-100 text-left text-gray-700'>
+                  <th className='px-4 py-3 border'>Invoice No</th>
+                  <th className='px-4 py-3 border'>Status</th>
+                  <th className='px-4 py-3 border'>Remarks</th>
+                  <th className='px-4 py-3 border'>Created By</th>
                 </tr>
               </thead>
 
               <tbody>
                 {selectedMaterialAccDetails.map((acc) => (
-                  <tr key={acc.acc_detail_id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 border">{acc.invoice_no}</td>
-                    <td className="px-4 py-3 border">{acc.status}</td>
-                    <td className="px-4 py-3 border">{acc.remarks}</td>
-                    <td className="px-4 py-3 border">{acc.created_by}</td>
+                  <tr key={acc.acc_detail_id} className='hover:bg-gray-50'>
+                    <td className='px-4 py-3 border'>{acc.invoice_no}</td>
+                    <td className='px-4 py-3 border'>{acc.status}</td>
+                    <td className='px-4 py-3 border'>{acc.remarks}</td>
+                    <td className='px-4 py-3 border'>{acc.created_by}</td>
                   </tr>
                 ))}
               </tbody>
@@ -459,12 +523,11 @@ const OutwardDetail: React.FC<OutwardDetailProps> = ({ product }) => {
         </>
       ) : (
         selectedMaterialId && (
-          <p className="text-gray-500 italic text-center mt-6">
+          <p className='text-gray-500 italic text-center mt-6'>
             No Account details found for this material.
           </p>
         )
       )}
-
     </Card>
   );
 };
