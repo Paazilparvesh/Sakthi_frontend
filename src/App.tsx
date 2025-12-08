@@ -32,6 +32,9 @@ import AccountsDashboard from './pages/Dashboard_Page/AccountsDashBoard';
 
 import Unauthorized from './pages/Normal_Page/Unauthorized';
 
+import { LicenseManager } from "ag-grid-enterprise";
+LicenseManager.setLicenseKey(import.meta.env.VITE_AGGRID_LICENSE_KEY);
+
 
 interface ProtectedLayoutProps {
   roles?: string[];
