@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,22 +26,71 @@ const ProgrammerEditForm: React.FC<Props> = ({
     selectedMaterialId,
     setSelectedMaterialId,
 }) => {
-    const selectedMaterial = materials.find((m) => m.id === selectedMaterialId);
 
     const [formData, setFormData] = useState<any>({});
     const [loading, setLoading] = useState(false);
     const [confirmModal, setConfirmModal] = useState(false);
     const [resultModal, setResultModal] = useState(false);
     const [updateStatus, setUpdateStatus] = useState<"success" | "failed" | "idle">("idle");
-    const [attempts, setAttempts] = useState(0);
 
-    const updateField = (key: string, value: any) => {
-        setFormData((prev: any) => ({ ...prev, [key]: value }));
+    /* ---------------------------------------------
+        HANDLE DROPDOWN MATERIAL CHANGE
+    --------------------------------------------- */
+    const handleMaterialChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const id = Number(e.target.value);
+        setSelectedMaterialId(id);
+        setFormData({});
     };
 
-    /* ---------------------------------------------------------
-     * API: Update Programmer Details
-     * --------------------------------------------------------- */
+    useEffect(() => {
+    if (materials.length === 1 && !selectedMaterialId) {
+        setSelectedMaterialId(materials[0].id);  // auto-select
+    }
+}, [materials, selectedMaterialId]);
+
+    /* ---------------------------------------------
+        LOAD PROGRAMMER DETAILS WHEN MATERIAL CHANGES
+    --------------------------------------------- */
+    useEffect(() => {
+        if (!selectedMaterialId) return;
+
+        const url = `${API_URL}/api/get_programer_Details/?product_id=${productId}&material_id=${selectedMaterialId}`;
+
+        const fetchDetails = async () => {
+            try {
+                const res = await fetch(url);
+                if (!res.ok) {
+                    console.error("FETCH ERROR:", await res.text());
+                    return;
+                }
+
+                const data = await res.json();
+                if (!Array.isArray(data) || data.length === 0) return;
+
+                setFormData(data[0]);
+            } catch (err) {
+                console.error("FETCH FAILED:", err);
+            }
+        };
+
+        fetchDetails();
+    }, [selectedMaterialId, productId]);
+
+    /* ---------------------------------------------
+        FORM FIELD CHANGE HANDLER
+    --------------------------------------------- */
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+
+        setFormData((prev: any) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    /* ---------------------------------------------
+        UPDATE PROGRAMMER DETAILS
+    --------------------------------------------- */
     const handleUpdate = async () => {
         if (!selectedMaterialId) return;
 
@@ -52,7 +101,7 @@ const ProgrammerEditForm: React.FC<Props> = ({
             ...formData,
         };
 
-        console.log("📤 PROGRAMMER UPDATE PAYLOAD:", payload);
+        console.log("📤 PAYLOAD:", payload);
 
         try {
             const res = await fetch(
@@ -64,13 +113,9 @@ const ProgrammerEditForm: React.FC<Props> = ({
                 }
             );
 
-            if (res.ok) {
-                setUpdateStatus("success");
-            } else {
-                setUpdateStatus("failed");
-            }
+            setUpdateStatus(res.ok ? "success" : "failed");
         } catch (err) {
-            console.error("PROGRAMMER UPDATE ERROR:", err);
+            console.error("UPDATE ERROR:", err);
             setUpdateStatus("failed");
         }
 
@@ -78,10 +123,10 @@ const ProgrammerEditForm: React.FC<Props> = ({
         setResultModal(true);
     };
 
-    /* ---------------------------------------------------------
-     * Programmer Fields (based on backend)
-     * --------------------------------------------------------- */
-    const programmerFields = [
+    /* ---------------------------------------------
+        PROGRAMMER FIELDS
+    --------------------------------------------- */
+    const fields = [
         "program_no",
         "program_date",
         "processed_quantity",
@@ -89,85 +134,127 @@ const ProgrammerEditForm: React.FC<Props> = ({
         "processed_width",
         "processed_length",
         "used_weight",
+        "total_used_weight",
         "number_of_sheets",
+        "total_no_of_sheets",
         "cut_length_per_sheet",
+        "total_meters",
         "pierce_per_sheet",
+        "total_piercing",
         "processed_mins_per_sheet",
         "total_planned_hours",
-        "total_meters",
-        "total_piercing",
-        "total_used_weight",
-        "total_no_of_sheets",
-        "date",
-        "time",
+
+
+
         "remarks",
     ];
 
+    const label = (key: string) => key.replace(/_/g, " ").toUpperCase();
+
     return (
         <div className="space-y-6">
-            {/* Material Selection Table */}
-            <h3 className="text-lg font-semibold">Select Material</h3>
 
-            <table className="w-full border text-center">
-                <thead className="bg-gray-100 text-gray-700">
-                    <tr>
-                        <th className="border px-2 py-1">S.No</th>
-                        <th className="border px-2 py-1">Type</th>
-                        <th className="border px-2 py-1">Grade</th>
-                        <th className="border px-2 py-1">Action</th>
-                    </tr>
-                </thead>
+            {/* ----------------- MATERIAL DROPDOWN ----------------- */}
+            <div className="flex flex-col space-y-1.5 w-full md:w-1/3">
+                <label className="text-sm font-medium text-gray-700">
+                    Select Material
+                </label>
+                <select
+                    value={selectedMaterialId ?? ""}
+                    onChange={handleMaterialChange}
+                    className="border rounded-lg px-3 py-2 focus:ring-2 border-gray-300 focus:ring-blue-500"
+                >
+                    <option value="">Select Material</option>
 
-                <tbody>
-                    {materials.map((m, i) => (
-                        <tr key={m.id} className="hover:bg-gray-50">
-                            <td className="border px-2 py-1">{i + 1}</td>
-                            <td className="border px-2 py-1">{m.mat_type}</td>
-                            <td className="border px-2 py-1">{m.mat_grade}</td>
-                            <td className="border px-2 py-1">
-                                <Button
-                                    size="sm"
-                                    className={`${selectedMaterialId === m.id
-                                            ? "bg-green-600"
-                                            : "bg-blue-600"
-                                        }`}
-                                    onClick={() => setSelectedMaterialId(m.id)}
-                                >
-                                    {selectedMaterialId === m.id ? "Selected" : "Edit"}
-                                </Button>
-                            </td>
-                        </tr>
+                    {materials.map((mat) => (
+                        <option key={mat.id} value={mat.id}>
+                            MT-{mat.mat_type} / G-{mat.mat_grade} / T-{mat.thick} / W-{mat.width} / L-{mat.length} / Qty-{mat.quantity}
+                        </option>
                     ))}
-                </tbody>
-            </table>
+                </select>
+            </div>
 
-            {/* Programmer Edit Form */}
-            {selectedMaterial && (
-                <div className="mt-6 p-5 border rounded-lg bg-gray-50 shadow-sm">
-                    <h3 className="text-xl font-semibold mb-4">
-                        Programmer Details – {selectedMaterial.mat_type} ({selectedMaterial.mat_grade})
+            {/* ----------------- SHOW FIELDS ONLY AFTER MATERIAL SELECTED ----------------- */}
+            {selectedMaterialId && (
+                <div className="mt-4 p-5 border rounded-xl bg-gray-50 shadow-sm space-y-6">
+                    <h3 className="text-xl font-semibold">
+                        Programmer Details
                     </h3>
 
-                    {/* Form Fields */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {programmerFields.map((field) => (
-                            <div key={field} className="flex flex-col">
-                                <label className="text-sm text-gray-600 capitalize">
-                                    {field.replace(/_/g, " ")}
+                    {/* ----------------- FORM FIELDS ----------------- */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                        
+                        {fields.map((key) => (
+                            <div key={key} className="flex flex-col gap-1">
+                                <label className="text-sm font-medium text-gray-700">
+                                    {label(key)}
                                 </label>
-                                <Input
-                                    placeholder={field.replace(/_/g, " ")}
-                                    value={formData[field] || ""}
-                                    onChange={(e) => updateField(field, e.target.value)}
-                                    className="bg-gray-50"
-                                />
+
+                               
+
+
+<input
+  type={
+    key === "remarks"
+      ? "text"
+      : key === "program_no"
+      ? "text"
+      : key === "program_date"
+      ? "date"
+      : "number"
+  }
+  name={key}
+  value={formData[key] || ""}
+  onChange={(e) => {
+    const value = e.target.value;
+
+    // Remarks: full text allowed
+    if (key === "remarks") {
+      setFormData((prev: any) => ({
+        ...prev,
+        [key]: value,
+      }));
+      return;
+    }
+
+    // program_no: alphanumeric allowed
+    if (key === "program_no") {
+      const cleanedValue = value.replace(/[^a-zA-Z0-9 -]/g, "");
+      setFormData((prev: any) => ({
+        ...prev,
+        [key]: cleanedValue,
+      }));
+      return;
+    }
+
+    // program_date: save directly (date input)
+    if (key === "program_date") {
+      setFormData((prev: any) => ({
+        ...prev,
+        [key]: value,
+      }));
+      return;
+    }
+
+    // For other fields => numbers only
+    const cleanedValue = value.replace(/[^0-9.]/g, "");
+    setFormData((prev: any) => ({
+      ...prev,
+      [key]: cleanedValue,
+    }));
+  }}
+  className="border rounded-lg px-3 py-2 focus:ring-2 border-gray-300 focus:ring-blue-500"
+/>
+
+
+
                             </div>
                         ))}
                     </div>
 
-                    {/* Update Button */}
+                    {/* ----------------- UPDATE BUTTON ----------------- */}
                     <Button
-                        className="mt-6 bg-green-600 text-white"
+                        className="mt-4 bg-green-600 text-white"
                         onClick={() => setConfirmModal(true)}
                         disabled={loading}
                     >
@@ -176,11 +263,9 @@ const ProgrammerEditForm: React.FC<Props> = ({
                 </div>
             )}
 
-            {/* ---------------------------------------------------------
-        CONFIRMATION MODAL
-      --------------------------------------------------------- */}
+            {/* ----------------- CONFIRM MODAL ----------------- */}
             <Dialog open={confirmModal} onOpenChange={setConfirmModal}>
-                <DialogContent className="max-w-md">
+                <DialogContent>
                     <DialogHeader>
                         <DialogTitle>Confirm Update</DialogTitle>
                     </DialogHeader>
@@ -189,12 +274,12 @@ const ProgrammerEditForm: React.FC<Props> = ({
                         Are you sure you want to update programmer details?
                     </p>
 
-                    <DialogFooter className="flex justify-end gap-3 mt-4">
+                    <DialogFooter>
                         <Button variant="outline" onClick={() => setConfirmModal(false)}>
                             Cancel
                         </Button>
                         <Button
-                            className="bg-green-600 text-white"
+                            className="bg-green-600"
                             onClick={() => {
                                 setConfirmModal(false);
                                 handleUpdate();
@@ -206,11 +291,9 @@ const ProgrammerEditForm: React.FC<Props> = ({
                 </DialogContent>
             </Dialog>
 
-            {/* ---------------------------------------------------------
-        RESULT MODAL
-      --------------------------------------------------------- */}
+            {/* ----------------- RESULT MODAL ----------------- */}
             <Dialog open={resultModal} onOpenChange={setResultModal}>
-                <DialogContent className="max-w-md">
+                <DialogContent>
                     <DialogHeader>
                         <DialogTitle>
                             {updateStatus === "success"
@@ -219,15 +302,16 @@ const ProgrammerEditForm: React.FC<Props> = ({
                         </DialogTitle>
                     </DialogHeader>
 
-                    {updateStatus === "success" ? (
-                        <p className="text-green-700 font-medium">
-                            ✔ Programmer details updated successfully.
-                        </p>
-                    ) : (
-                        <p className="text-red-700 font-medium">
-                            ❌ Update failed. Please try again or contact support.
-                        </p>
-                    )}
+                    <p
+                        className={`font-medium ${updateStatus === "success"
+                                ? "text-green-700"
+                                : "text-red-700"
+                            }`}
+                    >
+                        {updateStatus === "success"
+                            ? "✔ Programmer details updated successfully."
+                            : "❌ Update failed. Please try again."}
+                    </p>
 
                     <DialogFooter>
                         <Button onClick={() => setResultModal(false)}>Close</Button>
