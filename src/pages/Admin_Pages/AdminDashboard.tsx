@@ -7,7 +7,7 @@ import AdminCompanies from "@/components/AdminComponents/AdminCompanies.tsx";
 import AdminOperators from "@/components/AdminComponents/AdminOperators.tsx";
 import AdminMaterials from "@/components/AdminComponents/AdminMaterials.tsx";
 import AdminMachines from "@/components/AdminComponents/AdminMachines.tsx";
-import AdminReports from "@/components/AdminComponents/AdminReports.tsx";
+import AdminReports from "@/components/AdminComponents/AdminReportWrapper.tsx";
 
 const AdminDashboardWrapper: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>("products");

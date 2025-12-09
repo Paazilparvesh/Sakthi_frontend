@@ -89,16 +89,23 @@ export interface ProgramerDetails {
   created_by__username: string;
 }
 
+export interface QaMachineLog {
+  machine: string;
+  date: string;
+  start: string;
+  end: string;
+  runtime: string;
+}
+
 export interface QaDetails {
   id: number;
   processed_date: string;
   shift: string;
   no_of_sheets: number;
-  cycletime_per_sheet: string;
-  total_cycle_time: string;
-  operator_name: string;
-  machines_used: string;  // <-- NOT machine_used
-  created_by__username: string;
+  cycletime_per_sheet: number;
+  total_cycle_time: number;
+  machines_used: QaMachineLog[];
+  created_by: string;
 }
 
 export interface AccountDetails {

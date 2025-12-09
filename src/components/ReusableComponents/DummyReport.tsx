@@ -30,7 +30,7 @@ const FILTER_CONFIG: Record<FilterType, FilterConfig> = {
     },
     user: {
         label: "User",
-        api: "/api/get_users/", // <-- adjust if you use /api/get_all_users/
+        api: "/api/get_all_users/", // <-- adjust if you use /api/get_all_users/
         map: (item) => item.username,
     },
     machine: {
@@ -180,11 +180,10 @@ const ReportDashboard: React.FC = () => {
     };
 
     return (
-        <div className="space-y-6 text-gray-800">
-            <h2 className="text-2xl font-semibold">Production Report Dashboard</h2>
+        <div className="space-y-3 text-gray-800">
 
             {/* FILTERS */}
-            <Card className="p-6 shadow-sm border">
+            <Card className="p-4 shadow-sm border">
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
                     {/* Filter Type */}
                     <div className="flex flex-col gap-1">

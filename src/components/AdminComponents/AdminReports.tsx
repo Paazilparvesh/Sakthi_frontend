@@ -158,6 +158,10 @@ const AdminProducts: React.FC = () => {
         const qa = m.qa_details?.[0];
         const acc = m.account_details?.[0];
 
+        const machineLog = qa?.machines_used
+          ?.map((log) => `${log.machine} (${log.start} - ${log.end})`)
+          ?.join(", ");
+
         rows.push({
           ...p,
           material_id: m.id,
@@ -192,16 +196,6 @@ const AdminProducts: React.FC = () => {
           total_no_of_sheets: prog?.total_no_of_sheets,
           program_remarks: prog?.remarks,
           created_by__username: prog?.created_by__username,
-          // planned_qty: prog?.planned_qty,
-          // balance_qty: prog?.balance_qty,
-          // used_weight: prog?.used_weight,
-          // no_of_components: prog?.no_of_components,
-          // cut_length: prog?.cut_length,
-          // pierce: prog?.pierce_count,
-
-          // planned_hrs: prog?.planned_hrs,
-          // total_mtr: qa?.total_mtr,
-          // total_piercing: qa?.total_piercing,
 
           // QA
           qa_processed_date: qa?.processed_date,
@@ -209,9 +203,8 @@ const AdminProducts: React.FC = () => {
           qa_sheets: qa?.no_of_sheets,
           qa_cycletime: qa?.cycletime_per_sheet,
           qa_total_cycle_time: qa?.total_cycle_time,
-          qa_operator: qa?.operator_name,
-          qa_machines_used: qa?.machines_used,
-          qa_created_by: qa?.created_by__username,
+          qa_machines_used: machineLog,
+          qa_created_by: qa?.created_by,
 
           // ACC
           acc_invoice_no: acc?.invoice_no,
@@ -231,11 +224,14 @@ const AdminProducts: React.FC = () => {
   flatRows = flatRows.filter((row) => {
     return Object.entries(columnFilters).every(([key, value]) => {
       if (!value) return true;
-      return String(row[key] ?? "")
-        .toLowerCase()
-        .includes(value.toLowerCase());
+
+      const rowValue = String((row)[key] ?? "").toLowerCase();
+      const filterValue = String(value).toLowerCase();
+
+      return rowValue.includes(filterValue);
     });
   });
+
 
 
   /* ---------------------------------------------------- */
@@ -254,12 +250,10 @@ const AdminProducts: React.FC = () => {
 
 
   return (
-    <div className="text-gray-700 space-y-6">
+    <div className="text-gray-700 space-y-2">
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between gap-4">
-        <h2 className="text-2xl font-semibold">Manage Products</h2>
-
+      <div className="flex flex-col sm:flex-row justify-end gap-4">
         {selectedIds.length > 0 && (
           <div className="flex items-center gap-4">
 
@@ -336,6 +330,18 @@ const AdminProducts: React.FC = () => {
                 <th className="border px-2 py-1">Total Used Wt.</th>
                 <th className="border px-2 py-1">Total Sheets</th>
                 <th className="border px-2 py-1">Remarks</th>
+
+                <th className="border px-2 py-1">Processed Date</th>
+                <th className="border px-2 py-1">Shift</th>
+                <th className="border px-2 py-1">Procesed Sheets</th>
+                <th className="border px-2 py-1">Cycle Time</th>
+                <th className="border px-2 py-1">Total Cycle Time</th>
+                <th className="border px-2 py-1">Machine Used</th>
+
+                <th className="border px-2 py-1">Invoice No</th>
+                <th className="border px-2 py-1">Accounts Status</th>
+                <th className="border px-2 py-1">Remarks</th>
+
               </tr>
 
               {/* FILTER Inputs */}
@@ -352,6 +358,7 @@ const AdminProducts: React.FC = () => {
                   "customer_dc_no",
                   "customer_name",
                   "contact_no",
+
                   "mat_type",
                   "mat_grade",
                   "thick",
@@ -364,6 +371,7 @@ const AdminProducts: React.FC = () => {
                   "bay",
                   "stock_due",
                   "remarks",
+
                   "program_no",
                   "program_date",
                   "processed_quantity",
@@ -381,6 +389,19 @@ const AdminProducts: React.FC = () => {
                   "total_used_weight",
                   "total_no_of_sheets",
                   "program_remarks",
+
+                  "qa_processed_date",
+                  "qa_shift",
+                  "qa_sheets",
+                  "qa_cycletime",
+                  "qa_total_cycle_time",
+                  "qa_machines_used",
+                  "qa_created_by",
+
+                  "acc_invoice_no",
+                  "acc_status",
+                  "acc_remarks",
+
                 ].map((key) => (
                   <th key={key} className="border">
                     <input
@@ -428,7 +449,6 @@ const AdminProducts: React.FC = () => {
                   <td className="border px-2 py-1">{row.bay}</td>
                   <td className="border px-2 py-1">{row.stock_due}</td>
                   <td className="border px-2 py-1">{row.remarks}</td>
-                  <td className="border px-2 py-1">{row.total_weight}</td>
 
                   <td className="border px-2 py-1">{row.program_no}</td>
                   <td className="border px-2 py-1">{row.program_date}</td>
@@ -438,9 +458,8 @@ const AdminProducts: React.FC = () => {
                   <td className="border px-2 py-1">{row.processed_length}</td>
                   <td className="border px-2 py-1">{row.used_weight}</td>
                   <td className="border px-2 py-1">{row.number_of_sheets}</td>
-
                   <td className="border px-2 py-1">{row.cut_length_per_sheet}</td>
-                  <td className="border px-2 py-1">{row.totapierce_per_sheetl_mtr}</td>
+                  <td className="border px-2 py-1">{row.pierce_per_sheet}</td>
                   <td className="border px-2 py-1">{row.processed_mins_per_sheet}</td>
                   <td className="border px-2 py-1">{row.total_planned_hours}</td>
                   <td className="border px-2 py-1">{row.total_meters}</td>
@@ -448,6 +467,19 @@ const AdminProducts: React.FC = () => {
                   <td className="border px-2 py-1">{row.total_used_weight}</td>
                   <td className="border px-2 py-1">{row.total_no_of_sheets}</td>
                   <td className="border px-2 py-1">{row.program_remarks}</td>
+
+                  <td className="border px-2 py-1">{row.qa_processed_date}</td>
+                  <td className="border px-2 py-1">{row.qa_shift}</td>
+                  <td className="border px-2 py-1">{row.qa_sheets}</td>
+                  <td className="border px-2 py-1">{row.qa_cycletime}</td>
+                  <td className="border px-2 py-1">{row.qa_total_cycle_time}</td>
+                  <td className="border px-2 py-1">{row.qa_machines_used}</td>
+
+                  <td className="border px-2 py-1">{row.acc_invoice_no}</td>
+                  <td className="border px-2 py-1">{row.acc_status}</td>
+                  <td className="border px-2 py-1">{row.acc_remarks}</td>
+
+
                 </tr>
               ))}
             </tbody>
