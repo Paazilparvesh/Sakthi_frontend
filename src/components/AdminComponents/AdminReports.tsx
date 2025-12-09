@@ -1,467 +1,461 @@
-// import React, { useMemo, useRef, useState } from "react";
-// import { Card } from "@/components/ui/card";
-// import { Button } from "@/components/ui/button";
-// import { Badge } from "@/components/ui/badge";
-// import { Input } from "@/components/ui/input";
-// import { Search, X } from "lucide-react";
-// import { useToast } from "@/components/ui/use-toast";
-
-// // AG Grid imports
-// import { AgGridReact } from "ag-grid-react";
-// import { ModuleRegistry } from "ag-grid-community";
-// import { AllCommunityModule } from "ag-grid-community";
-// import { AllEnterpriseModule } from "ag-grid-enterprise";
-
-// ModuleRegistry.registerModules([AllCommunityModule, AllEnterpriseModule]);
-
-// import "ag-grid-community/styles/ag-grid.css";
-// import "ag-grid-community/styles/ag-theme-quartz.css";
-// import "ag-grid-enterprise";
-
-// const AdminReports: React.FC = () => {
-//   const gridRef = useRef<any>(null);
-//   const { toast } = useToast();
-
-//   /* --------------------------
-//      MOCK DATA
-//   --------------------------- */
-//   const rawData = useMemo(
-//     () => [
-//       {
-//         date: "2025-01-10",
-//         company: "Apple",
-//         customer: "John Doe",
-//         product: "iPhone 15",
-//         quantity: 2,
-//         amount: 2400,
-//         status: "Completed",
-//       },
-//       {
-//         date: "2025-01-12",
-//         company: "Apple",
-//         customer: "Sarah Smith",
-//         product: "MacBook Pro",
-//         quantity: 1,
-//         amount: 3200,
-//         status: "Pending",
-//       },
-//       {
-//         date: "2025-01-15",
-//         company: "Apple",
-//         customer: "John Doe",
-//         product: "AirPods",
-//         quantity: 3,
-//         amount: 900,
-//         status: "Completed",
-//       },
-//       {
-//         date: "2025-01-20",
-//         company: "Samsung",
-//         customer: "Michael Lee",
-//         product: "Galaxy Tab",
-//         quantity: 1,
-//         amount: 1100,
-//         status: "Cancelled",
-//       },
-//     ],
-//     []
-//   );
-
-//   /* --------------------------
-//      SEARCH + FILTERS
-//   --------------------------- */
-//   const [searchQuery, setSearchQuery] = useState("");
-//   const [statusFilter, setStatusFilter] = useState("all");
-
-//   const filteredData = useMemo(() => {
-//     return rawData.filter((p) => {
-//       const match =
-//         p.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
-//         p.customer.toLowerCase().includes(searchQuery.toLowerCase()) ||
-//         p.product.toLowerCase().includes(searchQuery.toLowerCase());
-
-//       const statusMatch =
-//         statusFilter === "all" || p.status.toLowerCase() === statusFilter;
-
-//       return match && statusMatch;
-//     });
-//   }, [rawData, searchQuery, statusFilter]);
-
-//   /* --------------------------
-//      COLUMN DEFINITIONS
-//   --------------------------- */
-//   const columnDefs = useMemo(
-//     () => [
-//       { field: "date", filter: "agDateColumnFilter", minWidth: 140 },
-//       { field: "company", filter: "agTextColumnFilter" },
-//       { field: "customer", filter: "agTextColumnFilter" },
-//       { field: "product", filter: "agTextColumnFilter" },
-//       { field: "quantity", filter: "agNumberColumnFilter", aggFunc: "sum" },
-//       { field: "amount", filter: "agNumberColumnFilter", aggFunc: "sum" },
-//       {
-//         field: "status",
-//         filter: "agSetColumnFilter",
-//         cellRenderer: (params: any) => {
-//           const status = params.value.toLowerCase();
-//           const color =
-//             status === "completed"
-//               ? "bg-green-100 text-green-700 px-2 py-1 rounded text-xs"
-//               : status === "pending"
-//               ? "bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-xs"
-//               : "bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs";
-
-//           return `<span class="${color}">${params.value}</span>`;
-//         },
-//       },
-//     ],
-//     []
-//   );
-
-//   const defaultColDef = useMemo(
-//     () => ({
-//       resizable: true,
-//       filter: true,
-//       sortable: true,
-//       flex: 1,
-//       minWidth: 130,
-//     }),
-//     []
-//   );
-
-//   /* --------------------------
-//      EXPORT TO EXCEL
-//   --------------------------- */
-//   const exportExcel = () => {
-//     if (!gridRef.current) return;
-//     gridRef.current.api.exportDataAsExcel({
-//       sheetName: "Report",
-//       fileName: "Report.xlsx",
-//     });
-//   };
-
-//   return (
-//     <div className="text-gray-700 space-y-6">
-//       {/* Filters Header */}
-//       <div className="flex flex-col sm:flex-row justify-between gap-4">
-//         <h2 className="text-2xl font-semibold">Reports</h2>
-
-//         <div className="flex flex-wrap gap-3">
-//           {/* Search Box */}
-//           <div className="relative">
-//             <Search className="absolute left-3 top-3 text-gray-400" />
-//             <Input
-//               placeholder="Search..."
-//               value={searchQuery}
-//               onChange={(e) => setSearchQuery(e.target.value)}
-//               className="pl-9 w-72"
-//             />
-//             {searchQuery && (
-//               <X
-//                 className="absolute right-3 top-3 cursor-pointer"
-//                 onClick={() => setSearchQuery("")}
-//               />
-//             )}
-//           </div>
-
-//           {/* Status Filter */}
-//           <select
-//             value={statusFilter}
-//             onChange={(e) => setStatusFilter(e.target.value)}
-//             className="border px-3 py-2 rounded-md"
-//           >
-//             <option value="all">All</option>
-//             <option value="pending">Pending</option>
-//             <option value="completed">Completed</option>
-//             <option value="cancelled">Cancelled</option>
-//           </select>
-
-//           {/* Export Button */}
-//           <Button className="bg-blue-600 text-white" onClick={exportExcel}>
-//             Export
-//           </Button>
-//         </div>
-//       </div>
-
-//       {/* AG Grid Inside Card */}
-//       <Card className="border shadow-sm p-2">
-//         <div
-//           className="ag-theme-quartz"
-//           style={{ height: "75vh", width: "100%" }}
-//         >
-//           <AgGridReact
-//             ref={gridRef}
-//             rowData={filteredData}
-//             columnDefs={columnDefs}
-//             defaultColDef={defaultColDef}
-//             animateRows={true}
-//             enableRangeSelection={true}
-//             enableCharts={true}
-//             pagination={true}
-//             paginationPageSize={20}
-//           />
-//         </div>
-//       </Card>
-//     </div>
-//   );
-// };
-
-// export default AdminReports;
-
-
-
-
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useEffect, useState, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { Loader2 } from "lucide-react";
+import { ProductType } from "@/types/inward.type";
 
-export default function AdminFilteredProducts() {
-  const { toast } = useToast();
+/* ---------------------------------------------------- */
 
-  // API base URL directly from .env
-  const API_URL = import.meta.env.VITE_API_URL;
-
-  // Create axios instance here
-  const api = axios.create({
-    baseURL: API_URL,
-    timeout: 15000,
-  });
-
-  const [filters, setFilters] = useState({
-    page: 1,
-    page_size: 10,
-
-    serial_number: "",
-    company_name: "",
-    customer_name: "",
-
-    mat_type: "",
-    mat_grade: "",
-    bay: "",
-
-    program_no: "",
-    program_date: "",
-
-    processed_date: "",
-
-    invoice_no: "",
-
-    sort_by: "",
-    sort_order: "asc",
-  });
-
-  const [results, setResults] = useState([]);
-  const [pagination, setPagination] = useState({
-    page: 1,
-    total_products: 0,
-    page_size: 10,
-  });
-
-  const [expandedProduct, setExpandedProduct] = useState(null);
+const AdminProducts: React.FC = () => {
+  const [allDetails, setAllDetails] = useState<ProductType[]>([]);
+  const [filteredDetails, setFilteredDetails] = useState<ProductType[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // Fetch filtered data
-  const fetchFilteredData = async () => {
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [columnFilters, setColumnFilters] = useState({});
+
+
+  const { toast } = useToast();
+  const API_URL = import.meta.env.VITE_API_URL;
+
+
+  /* ---------------------------------------------------- */
+  /* FETCH ALL DATA */
+
+  const fetchOverallDetails = useCallback(async () => {
+    setLoading(true);
+
     try {
-      setLoading(true);
+      const response = await fetch(`${API_URL}/api/get_overall_details/`);
+      const data = await response.json();
 
-      const res = await api.get("/filter_overall_details/", {
-        params: filters,
-      });
+      const reversed = data.slice().reverse();
+      setAllDetails(reversed);
+      setFilteredDetails(reversed);
 
-      setResults(res.data.data);
-      setPagination({
-        page: res.data.page,
-        page_size: res.data.page_size,
-        total_products: res.data.total_products,
-      });
-
-    } catch (error) {
+    } catch (err) {
       toast({
         title: "Error",
-        description: "Unable to load filtered data.",
+        description: "Unable to load product details.",
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
+    }
+
+    setLoading(false);
+  }, [API_URL, toast]);
+
+  useEffect(() => {
+    fetchOverallDetails();
+  }, [fetchOverallDetails]);
+
+  /* ---------------------------------------------------- */
+  /* SELECTION HANDLERS */
+
+  const handleSelectOne = (materialId: number) => {
+    setSelectedIds((prev) =>
+      prev.includes(materialId)
+        ? prev.filter((x) => x !== materialId)
+        : [...prev, materialId]
+    );
+  };
+
+
+  const handleSelectAll = () => {
+    const allVisibleIds = flatRows.map((r) => r.material_id);
+
+    const allSelected = allVisibleIds.every((id) =>
+      selectedIds.includes(id)
+    );
+
+    if (allSelected) {
+      // Unselect only visible rows
+      setSelectedIds((prev) =>
+        prev.filter((id) => !allVisibleIds.includes(id))
+      );
+    } else {
+      // Select all visible rows + keep previously selected hidden ones
+      setSelectedIds((prev) => Array.from(new Set([...prev, ...allVisibleIds])));
     }
   };
 
-  // Fetch on mount + when sorting/pagination changes
-  useEffect(() => {
-    fetchFilteredData();
-  }, [filters.page, filters.sort_by, filters.sort_order]);
 
-  // Update filter instantly
-  const updateFilter = (key, value) => {
-    setFilters((prev) => ({
+  const getSelectedProductIds = () => selectedIds;
+
+  /* ---------------------------------------------------- */
+  /* EXPORT */
+
+  const handleExport = async () => {
+    const productIds = getSelectedProductIds();
+
+    if (productIds.length === 0) {
+      return toast({
+        title: "No Selection",
+        description: "Select at least one product.",
+        variant: "destructive",
+      });
+    }
+
+    try {
+      const idString = `[${selectedIds.join(",")}]`;
+
+      const res = await fetch(
+        `${API_URL}/api/export_specific_details/${idString}/`
+      );
+
+      if (!res.ok) {
+        return toast({
+          title: "Export failed",
+          description: "Something went wrong exporting data.",
+        });
+      }
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `products_export.xlsx`;
+      a.click();
+
+      URL.revokeObjectURL(url);
+
+      toast({
+        title: "Export Completed",
+        description: "Excel downloaded.",
+      });
+    } catch (err) {
+      toast({
+        title: "Export Failed",
+        description: "Backend error occurred.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const updateColumnFilter = (key: string, value: string) => {
+    setColumnFilters((prev) => ({
       ...prev,
-      page: 1,
       [key]: value,
     }));
   };
 
-  // Expand dropdown
-  const toggleExpand = (id) => {
-    setExpandedProduct((prev) => (prev === id ? null : id));
+
+  /* ---------------------------------------------------- */
+  /* FLATTEN ROWS LIKE EXCEL */
+
+  const flattenRows = (products: ProductType[]) => {
+    const rows = [];
+
+    products.forEach((p) => {
+      if (!p.materials || p.materials.length === 0) {
+        rows.push({ ...p, mat_type: "", thick: "", width: "", length: "" });
+        return;
+      }
+
+      p.materials.forEach((m) => {
+        const prog = m.programer_details?.[0];
+        const qa = m.qa_details?.[0];
+        const acc = m.account_details?.[0];
+
+        rows.push({
+          ...p,
+          material_id: m.id,
+          mat_type: m.mat_type,
+          mat_grade: m.mat_grade,
+          thick: m.thick,
+          width: m.width,
+          length: m.length,
+          density: m.density,
+          unit_weight: m.unit_weight,
+          quantity: m.quantity,
+          total_weight: m.total_weight,
+          bay: m.bay,
+          stock_due: m.stock_due,
+          remarks: m.remarks,
+
+          program_no: prog?.program_no,
+          program_date: prog?.program_date,
+          processed_quantity: prog?.processed_quantity,
+          balance_quantity: prog?.balance_quantity,
+          processed_width: prog?.processed_width,
+          processed_length: prog?.processed_length,
+          used_weight: prog?.used_weight,
+          number_of_sheets: prog?.number_of_sheets,
+          cut_length_per_sheet: prog?.cut_length_per_sheet,
+          pierce_per_sheet: prog?.pierce_per_sheet,
+          processed_mins_per_sheet: prog?.processed_mins_per_sheet,
+          total_planned_hours: prog?.total_planned_hours,
+          total_meters: prog?.total_meters,
+          total_piercing: prog?.total_piercing,
+          total_used_weight: prog?.total_used_weight,
+          total_no_of_sheets: prog?.total_no_of_sheets,
+          program_remarks: prog?.remarks,
+          created_by__username: prog?.created_by__username,
+          // planned_qty: prog?.planned_qty,
+          // balance_qty: prog?.balance_qty,
+          // used_weight: prog?.used_weight,
+          // no_of_components: prog?.no_of_components,
+          // cut_length: prog?.cut_length,
+          // pierce: prog?.pierce_count,
+
+          // planned_hrs: prog?.planned_hrs,
+          // total_mtr: qa?.total_mtr,
+          // total_piercing: qa?.total_piercing,
+
+          // QA
+          qa_processed_date: qa?.processed_date,
+          qa_shift: qa?.shift,
+          qa_sheets: qa?.no_of_sheets,
+          qa_cycletime: qa?.cycletime_per_sheet,
+          qa_total_cycle_time: qa?.total_cycle_time,
+          qa_operator: qa?.operator_name,
+          qa_machines_used: qa?.machines_used,
+          qa_created_by: qa?.created_by__username,
+
+          // ACC
+          acc_invoice_no: acc?.invoice_no,
+          acc_status: acc?.status,
+          acc_remarks: acc?.remarks,
+          acc_created_by: acc?.created_by__username,
+        });
+      });
+    });
+
+    return rows;
   };
 
-  return (
-    <div className="p-6 space-y-6 max-w-7xl mx-auto">
-      {/* Page Title */}
-      <h1 className="text-2xl font-semibold">Filtered Product Overview</h1>
+  let flatRows = flattenRows(filteredDetails);
 
-      {/* Filters UI */}
-      <Card className="p-4 space-y-4">
-        <h2 className="text-lg font-semibold">Filters</h2>
+  // Apply column filters
+  flatRows = flatRows.filter((row) => {
+    return Object.entries(columnFilters).every(([key, value]) => {
+      if (!value) return true;
+      return String(row[key] ?? "")
+        .toLowerCase()
+        .includes(value.toLowerCase());
+    });
+  });
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Input placeholder="Serial Number" value={filters.serial_number} onChange={(e) => updateFilter("serial_number", e.target.value)} />
-          <Input placeholder="Company Name" value={filters.company_name} onChange={(e) => updateFilter("company_name", e.target.value)} />
-          <Input placeholder="Customer Name" value={filters.customer_name} onChange={(e) => updateFilter("customer_name", e.target.value)} />
 
-          <Input placeholder="Material Type" value={filters.mat_type} onChange={(e) => updateFilter("mat_type", e.target.value)} />
-          <Input placeholder="Material Grade" value={filters.mat_grade} onChange={(e) => updateFilter("mat_grade", e.target.value)} />
-          <Input placeholder="Bay" value={filters.bay} onChange={(e) => updateFilter("bay", e.target.value)} />
+  /* ---------------------------------------------------- */
 
-          <Input placeholder="Program No" value={filters.program_no} onChange={(e) => updateFilter("program_no", e.target.value)} />
-          <Input type="date" value={filters.program_date} onChange={(e) => updateFilter("program_date", e.target.value)} />
-
-          <Input type="date" value={filters.processed_date} onChange={(e) => updateFilter("processed_date", e.target.value)} />
-          <Input placeholder="Invoice No" value={filters.invoice_no} onChange={(e) => updateFilter("invoice_no", e.target.value)} />
-        </div>
-
-        <div className="flex gap-4">
-          <Button onClick={fetchFilteredData}>Apply Filters</Button>
-          <Button
-            variant="secondary"
-            onClick={() =>
-              setFilters({
-                page: 1,
-                page_size: 10,
-                serial_number: "",
-                company_name: "",
-                customer_name: "",
-                mat_type: "",
-                mat_grade: "",
-                bay: "",
-                program_no: "",
-                program_date: "",
-                processed_date: "",
-                invoice_no: "",
-                sort_by: "",
-                sort_order: "asc",
-              })
-            }
-          >
-            Reset
-          </Button>
-        </div>
-      </Card>
-
-      {/* Sorting UI */}
-      <Card className="p-4 flex gap-4 items-center">
-        <Input
-          placeholder="Sort by field"
-          value={filters.sort_by}
-          onChange={(e) => updateFilter("sort_by", e.target.value)}
-          className="w-40"
-        />
-
-        <select
-          className="border px-3 py-2 rounded-md"
-          value={filters.sort_order}
-          onChange={(e) => updateFilter("sort_order", e.target.value)}
-        >
-          <option value="asc">Ascending</option>
-          <option value="desc">Descending</option>
-        </select>
-      </Card>
-
-      {/* Results Section */}
-      {loading ? (
-        <div className="flex justify-center py-16">
-          <Loader2 className="w-10 h-10 animate-spin" />
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {results.map((prod) => (
-            <Card key={prod.product_id} className="p-4">
-              {/* Product row */}
-              <div className="cursor-pointer" onClick={() => toggleExpand(prod.product_id)}>
-                <h3 className="text-lg font-semibold flex justify-between">
-                  {prod.serial_number} — {prod.company_name}
-                  <Badge variant="outline">{expandedProduct === prod.product_id ? "Hide" : "View"}</Badge>
-                </h3>
-                <p className="text-sm text-gray-600">Customer: {prod.customer_name}</p>
-              </div>
-
-              {/* Expand materials */}
-              {expandedProduct === prod.product_id && (
-                <div className="mt-4 space-y-5">
-                  {prod.materials.map((mat) => (
-                    <Card key={mat.id} className="p-4 bg-gray-50 border border-gray-200">
-                      <h4 className="font-semibold">
-                        Material: {mat.mat_type} — {mat.mat_grade}
-                      </h4>
-                      <p className="text-sm">
-                        Bay: {mat.bay} <br />
-                        Size: {mat.thick} × {mat.width} × {mat.length}
-                      </p>
-
-                      <div className="mt-3">
-                        <h5 className="font-semibold text-sm">Programmer Details</h5>
-                        <pre className="text-xs bg-white p-2 rounded border">
-                          {JSON.stringify(mat.programmer_details, null, 2)}
-                        </pre>
-                      </div>
-
-                      <div className="mt-3">
-                        <h5 className="font-semibold text-sm">QA Details</h5>
-                        <pre className="text-xs bg-white p-2 rounded border">
-                          {JSON.stringify(mat.qa_details, null, 2)}
-                        </pre>
-                      </div>
-
-                      <div className="mt-3">
-                        <h5 className="font-semibold text-sm">ACC Billing</h5>
-                        <pre className="text-xs bg-white p-2 rounded border">
-                          {JSON.stringify(mat.acc_details, null, 2)}
-                        </pre>
-                      </div>
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </Card>
-          ))}
-        </div>
-      )}
-
-      {/* Pagination */}
-      <div className="flex justify-between items-center mt-6">
-        <Button
-          disabled={filters.page === 1}
-          onClick={() => setFilters((f) => ({ ...f, page: f.page - 1 }))}
-        >
-          Prev
-        </Button>
-
-        <span>
-          Page {pagination.page} / {Math.ceil(pagination.total_products / pagination.page_size)}
-        </span>
-
-        <Button
-          disabled={pagination.page * pagination.page_size >= pagination.total_products}
-          onClick={() => setFilters((f) => ({ ...f, page: f.page + 1 }))}
-        >
-          Next
-        </Button>
+  if (loading)
+    return (
+      <div className="flex items-center justify-center h-[60vh]">
+        <Loader2 className="animate-spin mr-2" />
+        Loading...
       </div>
+    );
+
+  const visibleSelectedCount = flatRows.filter(row =>
+    selectedIds.includes(row.material_id)
+  ).length;
+
+
+  return (
+    <div className="text-gray-700 space-y-6">
+
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between gap-4">
+        <h2 className="text-2xl font-semibold">Manage Products</h2>
+
+        {selectedIds.length > 0 && (
+          <div className="flex items-center gap-4">
+
+            {visibleSelectedCount > 0 && (
+              <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
+                {visibleSelectedCount} selected
+              </span>
+            )}
+
+            <Button className="bg-blue-600 text-white" onClick={handleExport}>
+              Export
+            </Button>
+          </div>
+        )}
+      </div>
+
+      {/* Table */}
+      <Card className="border shadow-sm">
+        <div className="overflow-auto max-h-[58vh] w-full" style={{ scrollbarWidth: "thin" }}>
+          <table className="w-full border-collapse text-sm">
+            <thead className="sticky top-0 z-20 bg-slate-200 shadow w-full">
+              {/* Column Labels */}
+              <tr className="text-center bg-slate-100 w-full">
+                <th className="px-2 py-1 bg-white">
+                  <input
+                    type="checkbox"
+                    checked={
+                      flatRows.length > 0 &&
+                      flatRows.every((row) => selectedIds.includes(row.material_id))
+                    }
+                    onChange={handleSelectAll}
+                  />
+
+                </th>
+
+                <th className="border px-2 py-1 min-w-20">S. No.</th>
+                <th className="border px-2 py-1 min-w-20">Slip No.</th>
+                <th className="border px-2 py-1">Color</th>
+                <th className="border px-2 py-1 min-w-32">Date</th>
+                <th className="border px-2 py-1 min-w-28">Work Order No.</th>
+                <th className="border px-2 py-1 min-w-80">Company Name</th>
+                <th className="border px-2 py-1 min-w-32">Customer Dc No.</th>
+                <th className="border px-2 py-1 min-w-36">Contact Person Name</th>
+                <th className="border px-2 py-1 min-w-36">Contact Person No.</th>
+
+
+                <th className="border px-2 py-1 min-w-24">Mat. Type</th>
+                <th className="border px-2 py-1 min-w-24">Grade</th>
+                <th className="border px-2 py-1 min-w-20">Thick</th>
+                <th className="border px-2 py-1 min-w-20">Width</th>
+                <th className="border px-2 py-1 min-w-20">Length</th>
+                <th className="border px-2 py-1 min-w-28">Density</th>
+                <th className="border px-2 py-1 min-w-28">Unit Weight</th>
+                <th className="border px-2 py-1 min-w-16">Qty</th>
+                <th className="border px-2 py-1 min-w-20">Total Weight</th>
+                <th className="border px-2 py-1 min-w-20">Bay</th>
+                <th className="border px-2 py-1 min-w-20">Stock Due</th>
+                <th className="border px-2 py-1 min-w-20">Remarks</th>
+
+                <th className="border px-2 py-1 min-w-32">Program No</th>
+                <th className="border px-2 py-1 min-w-36">Program Date</th>
+                <th className="border px-2 py-1">Planned Qty</th>
+                <th className="border px-2 py-1">Bal Qty</th>
+                <th className="border px-2 py-1">Processed Width</th>
+                <th className="border px-2 py-1">Processed Length</th>
+                <th className="border px-2 py-1">Used Wt</th>
+                <th className="border px-2 py-1">No of Sheets</th>
+                <th className="border px-2 py-1">Cut Length</th>
+                <th className="border px-2 py-1">Pierce</th>
+                <th className="border px-2 py-1">Processed Mins</th>
+                <th className="border px-2 py-1">Planned Hrs</th>
+                <th className="border px-2 py-1">Total Mtr</th>
+                <th className="border px-2 py-1">Total Piercing</th>
+                <th className="border px-2 py-1">Total Used Wt.</th>
+                <th className="border px-2 py-1">Total Sheets</th>
+                <th className="border px-2 py-1">Remarks</th>
+              </tr>
+
+              {/* FILTER Inputs */}
+              <tr className="bg-white text-center">
+                <th className="border-none px-2"></th>
+
+                {[
+                  "serial_number",
+                  "inward_slip_number",
+                  "color",
+                  "date",
+                  "worker_no",
+                  "company_name",
+                  "customer_dc_no",
+                  "customer_name",
+                  "contact_no",
+                  "mat_type",
+                  "mat_grade",
+                  "thick",
+                  "width",
+                  "length",
+                  "density",
+                  "unit_weight",
+                  "quantity",
+                  "total_weight",
+                  "bay",
+                  "stock_due",
+                  "remarks",
+                  "program_no",
+                  "program_date",
+                  "processed_quantity",
+                  "balance_quantity",
+                  "processed_width",
+                  "processed_length",
+                  "used_weight",
+                  "number_of_sheets",
+                  "cut_length_per_sheet",
+                  "pierce_per_sheet",
+                  "processed_mins_per_sheet",
+                  "total_planned_hours",
+                  "total_meters",
+                  "total_piercing",
+                  "total_used_weight",
+                  "total_no_of_sheets",
+                  "program_remarks",
+                ].map((key) => (
+                  <th key={key} className="border">
+                    <input
+                      className="w-full placeholder:text-center text-xs font-light outline-none focus:outline-none focus:ring-0 border-none "
+                      placeholder="Search"
+                      value={columnFilters[key] || ""}
+                      onChange={(e) => updateColumnFilter(key, e.target.value)}
+                    />
+                  </th>
+                ))}
+              </tr>
+            </thead>
+
+
+            <tbody>
+              {flatRows.map((row, idx) => (
+                <tr key={idx} className="border text-center hover:bg-gray-100">
+                  <td className="border px-2 py-1">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.includes(row.material_id)}
+                      onChange={() => handleSelectOne(row.material_id)}
+                    />
+                  </td>
+
+                  <td className="border px-2 py-1">{row.serial_number}</td>
+                  <td className="border px-2 py-1">{row.inward_slip_number}</td>
+                  <td className="border px-2 py-1">{row.color}</td>
+                  <td className="border px-2 py-1">{row.date}</td>
+                  <td className="border px-2 py-1">{row.worker_no}</td>
+                  <td className="border px-2 py-1">{row.company_name}</td>
+                  <td className="border px-2 py-1">{row.customer_dc_no}</td>
+                  <td className="border px-2 py-1">{row.customer_name}</td>
+                  <td className="border px-2 py-1">{row.contact_no}</td>
+
+                  <td className="border px-2 py-1">{row.mat_type}</td>
+                  <td className="border px-2 py-1">{row.mat_grade}</td>
+                  <td className="border px-2 py-1">{row.thick}</td>
+                  <td className="border px-2 py-1">{row.width}</td>
+                  <td className="border px-2 py-1">{row.length}</td>
+                  <td className="border px-2 py-1">{row.density}</td>
+                  <td className="border px-2 py-1">{row.unit_weight}</td>
+                  <td className="border px-2 py-1">{row.quantity}</td>
+                  <td className="border px-2 py-1">{row.total_weight}</td>
+                  <td className="border px-2 py-1">{row.bay}</td>
+                  <td className="border px-2 py-1">{row.stock_due}</td>
+                  <td className="border px-2 py-1">{row.remarks}</td>
+                  <td className="border px-2 py-1">{row.total_weight}</td>
+
+                  <td className="border px-2 py-1">{row.program_no}</td>
+                  <td className="border px-2 py-1">{row.program_date}</td>
+                  <td className="border px-2 py-1">{row.processed_quantity}</td>
+                  <td className="border px-2 py-1">{row.balance_quantity}</td>
+                  <td className="border px-2 py-1">{row.processed_width}</td>
+                  <td className="border px-2 py-1">{row.processed_length}</td>
+                  <td className="border px-2 py-1">{row.used_weight}</td>
+                  <td className="border px-2 py-1">{row.number_of_sheets}</td>
+
+                  <td className="border px-2 py-1">{row.cut_length_per_sheet}</td>
+                  <td className="border px-2 py-1">{row.totapierce_per_sheetl_mtr}</td>
+                  <td className="border px-2 py-1">{row.processed_mins_per_sheet}</td>
+                  <td className="border px-2 py-1">{row.total_planned_hours}</td>
+                  <td className="border px-2 py-1">{row.total_meters}</td>
+                  <td className="border px-2 py-1">{row.total_piercing}</td>
+                  <td className="border px-2 py-1">{row.total_used_weight}</td>
+                  <td className="border px-2 py-1">{row.total_no_of_sheets}</td>
+                  <td className="border px-2 py-1">{row.program_remarks}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
     </div>
   );
-}
+};
+
+export default AdminProducts;

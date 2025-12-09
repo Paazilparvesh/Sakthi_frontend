@@ -43,6 +43,8 @@ export interface Material {
   stock_due: number | string;
   remarks: string;
 
+  planned_qty?: number;
+
   programer_status?: string;
   qa_status?: string;
   acc_status?: string;
@@ -67,12 +69,24 @@ export interface Company {
 
 export interface ProgramerDetails {
   id: number;
-  program_no: string;
+  program_no: string | number;
   program_date: string;
-  processed_width: number;
-  processed_length: number;
-  created_by__username: string;   // <-- THIS IS CORRECT
-  // include all backend keys: processed_quantity, pierce_per_sheet, etc.
+  processed_quantity: string | number;
+  balance_quantity: string | number;
+  processed_width: string | number;
+  processed_length: string | number;
+  used_weight: string | number;
+  number_of_sheets: string | number;
+  cut_length_per_sheet: string | number;
+  pierce_per_sheet: string | number;
+  processed_mins_per_sheet: string | number;
+  total_planned_hours: string | number;
+  total_meters: string | number;
+  total_piercing: string | number;
+  total_used_weight: string | number;
+  total_no_of_sheets: string | number;
+  remarks: string | number;
+  created_by__username: string;
 }
 
 export interface QaDetails {
