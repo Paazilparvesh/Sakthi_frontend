@@ -95,6 +95,8 @@ export interface QaMachineLog {
   start: string;
   end: string;
   runtime: string;
+  air: string;
+  operator: string;
 }
 
 export interface QaDetails {

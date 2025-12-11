@@ -1,20 +1,20 @@
 import { Card } from '@/components/ui/card';
 import { useState } from 'react';
 
-import AdminReports from "@/components/AdminComponents/AdminReports.tsx"
-import AdminReports2 from "@/components/ReusableComponents/DummyReport.tsx"
+import SheetReport from "@/components/AdminComponents/ReportComponents/AdminSheetsReports.tsx"
+import CumulativeReport from "@/components/AdminComponents/ReportComponents/AdminCumulativeReport.tsx"
 
 const AdminEditPage = () => {
-    const [activeTab, setActiveTab] = useState('Report');
+    const [activeTab, setActiveTab] = useState('sheet');
 
     const renderTab = () => {
         switch (activeTab) {
-            case 'Report':
-                return <AdminReports />;
+            case 'sheet':
+                return <SheetReport />;
 
-            case 'Cumulative': {
+            case 'cumulative': {
                 return (
-                    <AdminReports2 />
+                    <CumulativeReport />
                 );
             }
             default:
@@ -29,24 +29,24 @@ const AdminEditPage = () => {
                 <h2 className="text-2xl font-semibold">Production Report Dashboard</h2>
                 <div className='flex items-center'>
                     <button
-                        className={`px-4 py-1 rounded-md ${activeTab === 'Report'
+                        className={`px-4 py-1 rounded-md ${activeTab === 'sheet'
                             ? 'bg-blue-600 text-white'
                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                             }`}
                         onClick={() => {
-                            setActiveTab('Report');
+                            setActiveTab('sheet');
                         }}
                     >
                         Sheets
                     </button>
                     {/* Programmer */}
                     <button
-                        className={`px-4 py-1 rounded-md ${activeTab === 'Cumulative'
+                        className={`px-4 py-1 rounded-md ${activeTab === 'cumulative'
                             ? 'bg-blue-600 text-white'
                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                             }`}
                         onClick={() => {
-                            setActiveTab('Cumulative');
+                            setActiveTab('cumulative');
                         }}
                     >
                         Cumulative
