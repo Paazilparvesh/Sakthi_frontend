@@ -36,8 +36,8 @@ export interface Material {
   thick: number | string;
   width: number | string;
   length: number | string;
-  unit_weight: number | string;
   density: number | string;
+  unit_weight: number | string;
   quantity: number | string;
   total_weight: number | string;
   stock_due: number | string;
@@ -47,10 +47,44 @@ export interface Material {
   qa_status?: string;
   acc_status?: string;
 
-
   programer_details?: ProgramerDetails[];
   qa_details?: QaDetails[];
   account_details?: AccountDetails[];
+}
+
+
+export interface ProgramerDetails {
+  id: number;
+  program_no: string;
+  program_date: string;
+  processed_quantity?: number;
+  balance_quantity?: number;
+  processed_width: number;
+  processed_length: number;
+  used_weight?: number;
+  number_of_sheets?: number;
+  cut_length_per_sheet?: number;
+  pierce_per_sheet?: number;
+  processed_mins_per_sheet?: number;
+  total_planned_hours?: number;
+  total_meters?: number;
+  total_piercing?: number;
+  total_used_weight?: number;
+  total_no_of_sheets?: number;
+  remarks?: string;
+  created_by?: string;
+}
+
+export interface QaDetails {
+  id: number;
+  processed_date: string;
+  shift: string;
+  no_of_sheets: number;
+  cycletime_per_sheet: string;
+  total_cycle_time: string;
+  operator_name: string;
+  machines_used: string;
+  created_by: string;
 }
 
 export interface Company {
@@ -65,34 +99,13 @@ export interface Company {
 
 
 
-export interface ProgramerDetails {
-  id: number;
-  program_no: string;
-  program_date: string;
-  processed_width: number;
-  processed_length: number;
-  created_by__username: string;   // <-- THIS IS CORRECT
-  // include all backend keys: processed_quantity, pierce_per_sheet, etc.
-}
-
-export interface QaDetails {
-  id: number;
-  processed_date: string;
-  shift: string;
-  no_of_sheets: number;
-  cycletime_per_sheet: string;
-  total_cycle_time: string;
-  operator_name: string;
-  machines_used: string;  // <-- NOT machine_used
-  created_by__username: string;
-}
 
 export interface AccountDetails {
   id: number;
   invoice_no: number;
   status: string;
   remarks: string;
-  created_by__username: string;
+  created_by: string;
 
   product_details?: number
 }

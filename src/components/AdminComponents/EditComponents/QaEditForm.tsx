@@ -1,6 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogHeader,
+  DialogTitle,
+  DialogContent,
+  DialogFooter,
+} from "@/components/ui/dialog";
+
 import { Material } from "@/types/inward.type";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -22,6 +30,16 @@ interface MachineRow {
   air: string;
 }
 
+interface QaResponseType {
+  material_details: number;
+  processed_date: string;
+  shift: string;
+  no_of_sheets: string;
+  cycletime_per_sheet: string;
+  total_cycle_time: string;
+  machines_used: MachineRow[];
+}
+
 const QaEditForm: React.FC<Props> = ({
   productId,
   materials,
@@ -30,13 +48,13 @@ const QaEditForm: React.FC<Props> = ({
 }) => {
   const selectedMaterial = materials.find((m) => m.id === selectedMaterialId);
 
-  const [qaData, setQaData] = useState<any>({
+  const [qaData, setQaData] = useState<Omit<QaResponseType, "material_details">>({
     processed_date: "",
     shift: "",
     no_of_sheets: "",
     cycletime_per_sheet: "",
     total_cycle_time: "",
-    machines_used: [] as MachineRow[],
+    machines_used: [],
   });
 
   const [machineForm, setMachineForm] = useState<MachineRow>({
@@ -50,47 +68,92 @@ const QaEditForm: React.FC<Props> = ({
   });
 
   const [editIndex, setEditIndex] = useState<number | null>(null);
-  const [openModal, setOpenModal] = useState(false);
+
+  // MODALS
+  const [machineModal, setMachineModal] = useState(false);
+  const [confirmModal, setConfirmModal] = useState(false);
+  const [resultModal, setResultModal] = useState(false);
+  const [updateStatus, setUpdateStatus] = useState<"success" | "failed" | "idle">("idle");
 
   const [loading, setLoading] = useState(false);
-  const [status, setStatus] =
-    useState<"idle" | "success" | "failed">("idle");
 
+  /* -------------------------------------------------------------------
+   * FETCH QA DETAILS FROM BACKEND WHEN MATERIAL IS SELECTED
+   * ------------------------------------------------------------------- */
+  useEffect(() => {
+    if (!selectedMaterialId) return;
+
+    const fetchQA = async () => {
+      try {
+        const res = await fetch(
+          `${API_URL}/api/get_qa_details/?product_id=${productId}`
+        );
+
+        const data: QaResponseType[] = await res.json();
+
+        // Filter for the specific material
+        const materialQA = data.find(
+          (item) => item.material_details === selectedMaterialId
+        );
+
+        if (materialQA) {
+          setQaData({
+            processed_date: materialQA.processed_date ?? "",
+            shift: materialQA.shift ?? "",
+            no_of_sheets: materialQA.no_of_sheets ?? "",
+            cycletime_per_sheet: materialQA.cycletime_per_sheet ?? "",
+            total_cycle_time: materialQA.total_cycle_time ?? "",
+            machines_used: materialQA.machines_used ?? [],
+          });
+        } else {
+          // Reset if no QA data exists yet
+          setQaData({
+            processed_date: "",
+            shift: "",
+            no_of_sheets: "",
+            cycletime_per_sheet: "",
+            total_cycle_time: "",
+            machines_used: [],
+          });
+        }
+      } catch (err) {
+        console.error("QA fetch error:", err);
+      }
+    };
+
+    fetchQA();
+  }, [selectedMaterialId, productId]);
+
+
+  /* ---------------- BASIC FIELD UPDATE ---------------- */
   const updateQAField = (key: string, value: any) => {
-    setQaData((prev: any) => ({ ...prev, [key]: value }));
+    setQaData((prev) => ({ ...prev, [key]: value }));
   };
 
-  /* ---------------- ADD MACHINE ---------------- */
-  const handleAddMachine = () => {
-    setQaData((prev: any) => ({
+  /* ---------------- MACHINE ADD ---------------- */
+  const addMachine = () => {
+    setQaData((prev) => ({
       ...prev,
       machines_used: [...prev.machines_used, machineForm],
     }));
-
-    setMachineForm({
-      machine: "",
-      date: "",
-      start: "",
-      end: "",
-      runtime: "",
-      operator: "",
-      air: "",
-    });
-
-    setOpenModal(false);
+    setMachineModal(false);
+    resetMachineForm();
   };
 
-  /* ---------------- EDIT MACHINE ---------------- */
-  const handleSaveEditMachine = () => {
+  /* ---------------- MACHINE EDIT ---------------- */
+  const saveMachineEdit = () => {
     if (editIndex === null) return;
 
     const updated = [...qaData.machines_used];
     updated[editIndex] = machineForm;
 
-    setQaData((prev: any) => ({ ...prev, machines_used: updated }));
-
-    setOpenModal(false);
+    setQaData((prev) => ({ ...prev, machines_used: updated }));
+    setMachineModal(false);
     setEditIndex(null);
+    resetMachineForm();
+  };
+
+  const resetMachineForm = () => {
     setMachineForm({
       machine: "",
       date: "",
@@ -102,41 +165,51 @@ const QaEditForm: React.FC<Props> = ({
     });
   };
 
-  /* ---------------- DELETE MACHINE ---------------- */
-  const handleDelete = (i: number) => {
+  /* ---------------- MACHINE DELETE ---------------- */
+  const deleteMachine = (i: number) => {
     const updated = qaData.machines_used.filter((_, idx) => idx !== i);
-    setQaData((prev: any) => ({ ...prev, machines_used: updated }));
+    setQaData((prev) => ({ ...prev, machines_used: updated }));
   };
 
-  /* ---------------- API UPDATE ---------------- */
-  const handleUpdateQA = async () => {
+  /* ---------------- UPDATE QA API ---------------- */
+  const updateQA = async () => {
     if (!selectedMaterialId) return;
 
     setLoading(true);
-    setStatus("idle");
 
-    const res = await fetch(`${API_URL}/api/update_qa_details/${productId}/`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        material_details: selectedMaterialId,
-        ...qaData,
-      }),
-    });
+    const payload = {
+      material_details: selectedMaterialId,
+      ...qaData,
+    };
+
+    console.log("📤 QA UPDATE PAYLOAD:", payload);
+
+    try {
+      const res = await fetch(`${API_URL}/api/update_qa_details/${productId}/`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        setUpdateStatus("success");
+      } else {
+        setUpdateStatus("failed");
+      }
+    } catch (err) {
+      console.error("QA UPDATE FAILED:", err);
+      setUpdateStatus("failed");
+    }
 
     setLoading(false);
-
-    if (res.ok) {
-      setStatus("success");
-    } else {
-      setStatus("failed");
-    }
+    setResultModal(true);
   };
+
 
   return (
     <div className="space-y-6">
-      {/* MATERIAL SELECT TABLE */}
-      <h3 className="text-lg font-semibold">Select Material for QA Update</h3>
+      {/* MATERIAL SELECTOR */}
+      <h3 className="text-lg font-semibold">Select Material for QA</h3>
 
       <table className="w-full border text-center">
         <thead className="bg-gray-100">
@@ -156,10 +229,14 @@ const QaEditForm: React.FC<Props> = ({
               <td className="border px-2 py-1">
                 <Button
                   size="sm"
+                  className={`${
+                    selectedMaterialId === m.id
+                      ? "bg-green-600"
+                      : "bg-blue-600"
+                  }`}
                   onClick={() => setSelectedMaterialId(m.id)}
-                  className="bg-blue-600"
                 >
-                  Edit QA
+                  {selectedMaterialId === m.id ? "Selected" : "Edit QA"}
                 </Button>
               </td>
             </tr>
@@ -169,48 +246,53 @@ const QaEditForm: React.FC<Props> = ({
 
       {/* QA FORM */}
       {selectedMaterial && (
-        <div className="mt-6 p-4 border rounded-xl bg-gray-50 space-y-4">
-          <h3 className="text-xl font-semibold mb-4">
-            Edit QA Details for {selectedMaterial.mat_type}
+        <div className="mt-6 p-5 rounded-xl border bg-gray-50 space-y-6">
+          <h3 className="text-xl font-semibold">
+            QA Details — {selectedMaterial.mat_type}
           </h3>
 
-          {/* BASIC QA FIELDS */}
+          {/* BASIC FIELDS */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {[
+            {[ 
               ["processed_date", "Processed Date"],
               ["shift", "Shift"],
               ["no_of_sheets", "No. of Sheets"],
               ["cycletime_per_sheet", "Cycle Time / Sheet"],
               ["total_cycle_time", "Total Cycle Time"],
             ].map(([key, label]) => (
-              <div key={key} className="flex flex-col">
+              <div key={key}>
                 <label className="text-sm text-gray-600">{label}</label>
                 <Input
-                  value={qaData[key] || ""}
+                  value={(qaData as any)[key]}
                   onChange={(e) => updateQAField(key, e.target.value)}
                 />
               </div>
             ))}
           </div>
 
-          {/* MACHINE TABLE */}
-          <h4 className="text-lg font-semibold mt-6">Machines Used</h4>
+          {/* MACHINES TABLE */}
+          <h4 className="text-lg font-semibold">Machines Used</h4>
 
-          <table className="w-full border text-center mt-3">
+          <table className="w-full border text-center">
             <thead className="bg-gray-200">
               <tr>
-                <th className="border px-2 py-1">Machine</th>
-                <th className="border px-2 py-1">Date</th>
-                <th className="border px-2 py-1">Start</th>
-                <th className="border px-2 py-1">End</th>
-                <th className="border px-2 py-1">Runtime</th>
-                <th className="border px-2 py-1">Operator</th>
-                <th className="border px-2 py-1">Air</th>
-                <th className="border px-2 py-1">Action</th>
+                {[
+                  "Machine",
+                  "Date",
+                  "Start",
+                  "End",
+                  "Runtime",
+                  "Operator",
+                  "Air",
+                  "Actions",
+                ].map((h) => (
+                  <th key={h} className="border px-2 py-1">{h}</th>
+                ))}
               </tr>
             </thead>
+
             <tbody>
-              {qaData.machines_used.map((m: MachineRow, i: number) => (
+              {qaData.machines_used.map((m, i) => (
                 <tr key={i} className="hover:bg-gray-50">
                   <td className="border px-2 py-1">{m.machine}</td>
                   <td className="border px-2 py-1">{m.date}</td>
@@ -224,9 +306,9 @@ const QaEditForm: React.FC<Props> = ({
                       size="sm"
                       className="bg-yellow-600"
                       onClick={() => {
-                        setMachineForm(m);
                         setEditIndex(i);
-                        setOpenModal(true);
+                        setMachineForm(m);
+                        setMachineModal(true);
                       }}
                     >
                       Edit
@@ -234,7 +316,7 @@ const QaEditForm: React.FC<Props> = ({
                     <Button
                       size="sm"
                       className="bg-red-600"
-                      onClick={() => handleDelete(i)}
+                      onClick={() => deleteMachine(i)}
                     >
                       Delete
                     </Button>
@@ -246,96 +328,112 @@ const QaEditForm: React.FC<Props> = ({
 
           {/* ADD MACHINE BUTTON */}
           <Button
-            className="mt-3 bg-blue-600"
+            className="bg-blue-600"
             onClick={() => {
               setEditIndex(null);
-              setMachineForm({
-                machine: "",
-                date: "",
-                start: "",
-                end: "",
-                runtime: "",
-                operator: "",
-                air: "",
-              });
-              setOpenModal(true);
+              resetMachineForm();
+              setMachineModal(true);
             }}
           >
             Add Machine
           </Button>
 
-          {/* UPDATE QA BUTTON */}
+          {/* UPDATE BUTTON (OPEN CONFIRM MODAL) */}
           <Button
-            className="mt-6 bg-green-600"
-            onClick={handleUpdateQA}
+            className="bg-green-600 mt-6"
+            onClick={() => setConfirmModal(true)}
             disabled={loading}
           >
             {loading ? "Updating..." : "Update QA"}
           </Button>
-
-          {status === "success" && (
-            <p className="text-green-600 mt-3 font-medium">
-              QA updated successfully ✔
-            </p>
-          )}
-
-          {status === "failed" && (
-            <p className="text-red-600 mt-3 font-medium">
-              Failed to update QA ❌
-            </p>
-          )}
         </div>
       )}
 
-      {/* ---------------- MODAL FOR MACHINE ADD/EDIT ---------------- */}
-      {openModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-20 flex justify-center items-center p-4">
-          <div className="bg-white rounded-xl p-6 w-full max-w-lg shadow-lg">
-            <h3 className="text-xl font-semibold mb-4">
+      {/* ---------------- CONFIRM UPDATE ---------------- */}
+      <Dialog open={confirmModal} onOpenChange={setConfirmModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Update</DialogTitle>
+          </DialogHeader>
+          <p>Are you sure you want to update QA details?</p>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfirmModal(false)}>
+              Cancel
+            </Button>
+            <Button
+              className="bg-green-600"
+              onClick={() => {
+                setConfirmModal(false);
+                updateQA();
+              }}
+            >
+              Yes, Update
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ---------------- RESULT MODAL ---------------- */}
+      <Dialog open={resultModal} onOpenChange={setResultModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {updateStatus === "success" ? "QA Updated ✔" : "Update Failed ❌"}
+            </DialogTitle>
+          </DialogHeader>
+
+          {updateStatus === "success" ? (
+            <p className="text-green-600">QA details updated successfully.</p>
+          ) : (
+            <p className="text-red-600">
+              Update failed. Please try again or contact support.
+            </p>
+          )}
+
+          <DialogFooter>
+            <Button onClick={() => setResultModal(false)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ---------------- ADD/EDIT MACHINE MODAL ---------------- */}
+      <Dialog open={machineModal} onOpenChange={setMachineModal}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>
               {editIndex !== null ? "Edit Machine" : "Add Machine"}
-            </h3>
+            </DialogTitle>
+          </DialogHeader>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {Object.keys(machineForm).map((key) => (
-                <div key={key} className="flex flex-col">
-                  <label className="text-sm text-gray-600 capitalize">
-                    {key.replace(/_/g, " ")}
-                  </label>
-                  <Input
-                    value={(machineForm as any)[key]}
-                    onChange={(e) =>
-                      setMachineForm((prev) => ({
-                        ...prev,
-                        [key]: e.target.value,
-                      }))
-                    }
-                  />
-                </div>
-              ))}
-            </div>
-
-            <div className="flex justify-end gap-3 mt-6">
-              <Button
-                className="bg-gray-300 text-black"
-                onClick={() => setOpenModal(false)}
-              >
-                Cancel
-              </Button>
-
-              <Button
-                className="bg-blue-600 text-white"
-                onClick={
-                  editIndex !== null
-                    ? handleSaveEditMachine
-                    : handleAddMachine
-                }
-              >
-                {editIndex !== null ? "Save Changes" : "Add Machine"}
-              </Button>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-4">
+            {Object.keys(machineForm).map((key) => (
+              <div key={key}>
+                <label className="text-sm capitalize">{key}</label>
+                <Input
+                  value={(machineForm as any)[key]}
+                  onChange={(e) =>
+                    setMachineForm((prev) => ({ ...prev, [key]: e.target.value }))
+                  }
+                />
+              </div>
+            ))}
           </div>
-        </div>
-      )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setMachineModal(false)}>
+              Cancel
+            </Button>
+
+            <Button
+              className="bg-blue-600"
+              onClick={editIndex !== null ? saveMachineEdit : addMachine}
+            >
+              {editIndex !== null ? "Save Changes" : "Add Machine"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

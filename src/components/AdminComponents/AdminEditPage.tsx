@@ -37,17 +37,19 @@ const AdminEditPage: React.FC<Props> = ({ product, onCancel, onBack }) => {
       case "Programmer":
         return (
           <ProgrammerEditForm
-            productId={form.id}
+            productId={form.product_id}
             materials={form.materials}
             selectedMaterialId={selectedMaterialId}
             setSelectedMaterialId={setSelectedMaterialId}
           />
         );
 
+
+
       case "QA":
         return (
           <QaEditForm
-            productId={form.id}
+            productId={form.product_id}
             materials={form.materials}
             selectedMaterialId={selectedMaterialId}
             setSelectedMaterialId={setSelectedMaterialId}
