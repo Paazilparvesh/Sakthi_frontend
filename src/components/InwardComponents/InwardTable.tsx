@@ -1,14 +1,10 @@
 import { Button } from '@/components/ui/button';
-import { ProductType, InwardProps, Material } from '@/types/inward.type';
+import { ProductType, InwardProps, Material, Density } from '@/types/inward.type';
 import { useEffect, useState, useCallback } from 'react';
 import { Trash2 } from 'lucide-react';
 import { fetchJSON } from '@/utils/api';
 
-interface Density {
-  id: number;
-  material_name: string;
-  density_value: number;
-}
+
 
 const InwardTable: React.FC<InwardProps> = ({ formData, setFormData }) => {
   const [items, setItems] = useState<Density[]>([]);

@@ -285,7 +285,7 @@ const AdminProducts: React.FC = () => {
     acc_remarks: "",
   }), [totals, TOTAL_ROW_ID]);
 
-  async function exportSelectedRows(rows: any[]) {
+  async function exportSelectedRows(rows: FlattenedRow[]) {
     const API_URL = import.meta.env.VITE_API_URL;
 
     const response = await axios.post(
@@ -346,7 +346,7 @@ const AdminProducts: React.FC = () => {
         title: "Success",
         description: "Excel exported successfully!",
       });
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
       toast({
         title: "Export Failed",

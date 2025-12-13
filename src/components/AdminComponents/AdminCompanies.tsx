@@ -14,22 +14,9 @@ import { Label } from "@/components/ui/label";
 import { Loader2, Plus, Upload, FileText, X, Pencil, Trash2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import * as XLSX from "xlsx";
+import { Company } from "@/types/inward.type";
 
 /* -------------------- TYPES (MATCH BACKEND) -------------------- */
-interface Company {
-  id: number;
-  company_name: string;
-  customer_name: string;
-  contact_no?: string;
-  customer_dc_no?: string;
-}
-
-interface BulkCompany {
-  company_name: string;
-  customer_name: string;
-  contact_no?: string;
-  customer_dc_no?: string;
-}
 
 /* -------------------- COMPONENT -------------------- */
 const AdminCompanies: React.FC = () => {
@@ -52,7 +39,7 @@ const AdminCompanies: React.FC = () => {
 
   // Bulk Upload
   const [bulkUploadLoading, setBulkUploadLoading] = useState(false);
-  const [previewCompanies, setPreviewCompanies] = useState<BulkCompany[]>([]);
+  const [previewCompanies, setPreviewCompanies] = useState<Company[]>([]);
   const [uploadedFileName, setUploadedFileName] = useState("");
 
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
@@ -181,7 +168,7 @@ const AdminCompanies: React.FC = () => {
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
         const rows = XLSX.utils.sheet_to_json(sheet);
 
-        const parsed: BulkCompany[] = [];
+        const parsed: Company[] = [];
 
         rows.forEach((row) => {
           const company_name =

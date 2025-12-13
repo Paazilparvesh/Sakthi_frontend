@@ -1,6 +1,6 @@
 import { Card } from '@/components/ui/card';
 import React, { useState } from 'react';
-import { ProductType } from '@/types/inward.type';
+import { ProductType, EditProps } from '@/types/inward.type';
 
 import InwardEditForm from '@/components/AdminComponents/EditComponents/InwardEditForm';
 import ProgrammerEditForm from '@/components/AdminComponents/EditComponents/ProgrammerEditForm';
@@ -9,13 +9,9 @@ import QaEditForm from '@/components/AdminComponents/EditComponents/QaEditForm';
 const tabs = ['Inward', 'Programmer', 'QA'] as const;
 type TabType = (typeof tabs)[number];
 
-interface Props {
-  product: ProductType;
-  onCancel: () => void;
-  onBack: () => void;
-}
 
-const AdminEditPage: React.FC<Props> = ({ product, onCancel, onBack }) => {
+
+const AdminEditPage: React.FC<EditProps> = ({ product, onCancel, onBack }) => {
   const [activeTab, setActiveTab] = useState<TabType>('Inward');
   const [form, setForm] = useState(product);
   const [selectedMaterialId, setSelectedMaterialId] = useState<number | null>(
@@ -69,11 +65,10 @@ const AdminEditPage: React.FC<Props> = ({ product, onCancel, onBack }) => {
         <div className='flex items-center'>
           {/* Inward - always allowed */}
           <button
-            className={`px-4 py-1 rounded-md ${
-              activeTab === 'Inward'
+            className={`px-4 py-1 rounded-md ${activeTab === 'Inward'
                 ? 'bg-blue-600 text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
+              }`}
             onClick={() => {
               setActiveTab('Inward');
               setSelectedMaterialId(null);
@@ -85,13 +80,12 @@ const AdminEditPage: React.FC<Props> = ({ product, onCancel, onBack }) => {
           {/* Programmer */}
           <button
             disabled={!canEditProgrammer}
-            className={`px-4 py-1 rounded-md ${
-              !canEditProgrammer
+            className={`px-4 py-1 rounded-md ${!canEditProgrammer
                 ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                 : activeTab === 'Programmer'
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
             onClick={() => {
               if (!canEditProgrammer) return;
               setActiveTab('Programmer');
@@ -104,13 +98,12 @@ const AdminEditPage: React.FC<Props> = ({ product, onCancel, onBack }) => {
           {/* QA */}
           <button
             disabled={!canEditQa || !canEditProgrammer}
-            className={`px-4 py-1 rounded-md ${
-              !canEditQa || !canEditProgrammer
+            className={`px-4 py-1 rounded-md ${!canEditQa || !canEditProgrammer
                 ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                 : activeTab === 'QA'
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
             onClick={() => {
               if (!canEditQa || !canEditProgrammer) return;
               setActiveTab('QA');

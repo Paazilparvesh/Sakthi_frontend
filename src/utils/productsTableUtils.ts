@@ -3,7 +3,7 @@ import {
   Material,
   ProgramerDetails,
   QaDetails,
-  QaMachineLog,
+  MachineLog,
   AccountDetails,
 } from "@/types/inward.type";
 
@@ -74,7 +74,7 @@ export const flattenRows = (products: ProductType[] = []): FlattenedRow[] => {
       const qa: QaDetails | undefined = m.qa_details?.[0];
       const acc: AccountDetails | undefined = m.account_details?.[0];
 
-      const machineLogs: QaMachineLog[] = qa?.machines_used || [];
+      const machineLogs: MachineLog[] = qa?.machines_used || [];
 
       /** CASE 1: Machine logs exist → create one row per log */
       if (machineLogs.length > 0) {

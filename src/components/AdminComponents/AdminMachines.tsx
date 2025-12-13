@@ -13,11 +13,9 @@ import {
 import { Label } from "@/components/ui/label";
 import { Loader2, Pencil, Trash2, Plus } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { Machine } from "@/types/inward.type";
 
-interface Machine {
-    id: number;
-    machine: string;
-}
+
 
 const AdminMachines: React.FC = () => {
     const API_URL = import.meta.env.VITE_API_URL;

@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -15,24 +15,11 @@ import {
 import { Loader2, UserPlus, Pencil, Trash2, ChevronsUpDown } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
-type RoleType = "inward" | "programer" | "qa" | "admin" | "accounts";
-
-interface UserItem {
-  id: number;
-  username: string;
-  email: string;
-  roles: string[];
-  isAdmin: boolean;
-}
+import { UserItem, UserForm, RoleType } from "@/types/user.type";
 
 
-interface UserForm {
-  username: string;
-  email: string;
-  password?: string;
-  role?: string[];
-  isAdmin?: boolean;   // <-- ADD THIS
-}
+
+
 
 const PAGE_SIZE = 10;
 
@@ -45,7 +32,6 @@ const AdminUsersAdvanced: React.FC = () => {
   const [refreshKey, setRefreshKey] = useState(0);
 
   const [query, setQuery] = useState("");
-  const [roleFilter, setRoleFilter] = useState<"" | RoleType | "all">("");
   const [sortBy, setSortBy] = useState<"username" | "email" | "role_type">("username");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   const [page, setPage] = useState(1);

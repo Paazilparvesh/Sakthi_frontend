@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import {
@@ -8,16 +8,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { Material } from '@/types/inward.type';
-
-interface AccountFormProps {
-  productId: number;
-  companyName: string;
-  materials: Material[];
-  programMap: Record<number, string>;
-  onBack: () => void;
-  onSubmitSuccess?: () => void;
-}
+import { OutwardProps } from '@/types/inward.type';
 
 interface AccountFormData {
   // material_details: string;
@@ -30,11 +21,11 @@ interface AccountFormData {
   created_by?: string;
 }
 
-const AccountForm: React.FC<AccountFormProps> = ({
+const AccountForm: React.FC<OutwardProps> = ({
   productId,
   companyName,
   materials,
-  programMap,
+  program_details,
   onBack,
   onSubmitSuccess,
 }) => {
@@ -82,7 +73,7 @@ const AccountForm: React.FC<AccountFormProps> = ({
   // }, [formData.material_details, API_URL]);
 
   // ✅ Handle Input Changes + Realtime Validation
- 
+
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -289,24 +280,24 @@ const AccountForm: React.FC<AccountFormProps> = ({
 
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  const id = Number(e.target.value);
+    const id = Number(e.target.value);
 
-  setFormData(prev => {
-    const updated =
-      prev.material_details.includes(id)
-        ? prev.material_details.filter(x => x !== id)
-        : [...prev.material_details, id];
+    setFormData(prev => {
+      const updated =
+        prev.material_details.includes(id)
+          ? prev.material_details.filter(x => x !== id)
+          : [...prev.material_details, id];
 
-    return {
-      ...prev,
-      material_details: updated,
-      remarks:
-        prev.status === "open"
-          ? `This Material is Processed on ${programMap[id] || "N/A"}`
-          : prev.remarks
-    };
-  });
-};
+      return {
+        ...prev,
+        material_details: updated,
+        remarks:
+          prev.status === "open"
+            ? `This Material is Processed on ${program_details[id] || "N/A"}`
+            : prev.remarks
+      };
+    });
+  };
 
 
   return (

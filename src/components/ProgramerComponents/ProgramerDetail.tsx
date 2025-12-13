@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { ProgramerDetailProps, QAData } from "@/types/qa.type";
-import { Material } from "@/types/inward.type";
+// import { ProgramerDetailProps, QAData } from "@/types/programer.type.ts";
+import { Material, ProgramerProps, ProgramerDetails } from "@/types/inward.type";
 import { useToast } from "@/hooks/use-toast";
-import { Separator } from "@/components/ui/separator";
 import { Button } from "../ui/button";
 
 const renderFieldCard = (
@@ -37,9 +36,9 @@ const renderFieldCard = (
   );
 };
 
-const ProgramerDetail: React.FC<ProgramerDetailProps> = ({ item }) => {
+const ProgramerDetail: React.FC<ProgramerProps> = ({ item }) => {
   const [selectedMaterialId, setSelectedMaterialId] = useState<number | null>(null);
-  const [materialDataMap, setMaterialDataMap] = useState<Record<number, QAData>>({});
+  const [materialDataMap, setMaterialDataMap] = useState<Record<number, ProgramerDetails>>({});
   const [loadingID, setLoadingID] = useState<number | null>(null);
   const { toast } = useToast();
 
@@ -154,7 +153,7 @@ const ProgramerDetail: React.FC<ProgramerDetailProps> = ({ item }) => {
               <thead className="bg-gray-100 text-gray-700 font-semibold">
                 <tr>
                   <th className="border px-1 py-1">S.No</th>
-		  <th className="border px-1 py-1">Bay</th>
+                  <th className="border px-1 py-1">Bay</th>
                   <th className="border px-1 py-1">Material Type</th>
                   <th className="border px-1 py-1">Material Grade</th>
                   <th className="border px-1 py-1">Thick (mm)</th>
@@ -178,7 +177,7 @@ const ProgramerDetail: React.FC<ProgramerDetailProps> = ({ item }) => {
                       <td className="border px-2 py-2 font-medium">
                         {index + 1}
                       </td>
-		      <td className="border px-2 py-2">{mat.bay || "-"}</td>
+                      <td className="border px-2 py-2">{mat.bay || "-"}</td>
                       <td className="border px-2 py-2">{mat.mat_type || "-"}</td>
                       <td className="border px-2 py-2">{mat.mat_grade || "-"}</td>
                       <td className="border px-2 py-2">{mat.thick ?? "-"}</td>

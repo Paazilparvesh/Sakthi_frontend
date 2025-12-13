@@ -45,7 +45,7 @@ const InwardDashboard: React.FC = () => {
       {
         mat_type: "",
         mat_grade: "",
-	bay: "",
+        bay: "",
         thick: "",
         width: "",
         length: "",
@@ -137,7 +137,7 @@ const InwardDashboard: React.FC = () => {
         {
           mat_type: "",
           mat_grade: "",
-	  bay: "",
+          bay: "",
           thick: "",
           width: "",
           length: "",
@@ -178,7 +178,7 @@ const InwardDashboard: React.FC = () => {
         materials: formData.materials.map((mat) => ({
           mat_type: mat.mat_type,
           mat_grade: mat.mat_grade,
-	  bay: mat.bay,
+          bay: mat.bay,
           thick: mat.thick,
           width: mat.width,
           length: mat.length,

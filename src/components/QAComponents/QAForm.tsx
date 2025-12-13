@@ -8,40 +8,13 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Material } from "@/types/inward.type";
-import { QAData } from "@/types/qa.type";
+import { OutwardProps, Operator, QaDetails } from "@/types/inward.type";
 
-interface QAFormProps {
-  productId: number;
-  companyName: string;
-  materials: Material[];
-  program: QAData[];
-  onBack: () => void;
-  onSubmitSuccess?: () => void;
-}
-
-interface QAFormData {
-  material_details: string;
-  processed_date: string;
-  shift: string;
-  no_of_sheets: string;
-  cycletime_per_sheet: string;
-  total_cycle_time: number;
-  total_cycle_time_formatted: string,
-  created_by_qa?: string;
-  created_by_acc?: string;
-}
-
-interface Operator {
-  id: number;
-  operator_name: string;
-}
-
-const QAForm: React.FC<QAFormProps> = ({
+const QAForm: React.FC<OutwardProps> = ({
   productId,
   companyName,
   materials,
-  program,
+  program_details,
   onBack,
   onSubmitSuccess,
 }) => {
@@ -78,7 +51,7 @@ const QAForm: React.FC<QAFormProps> = ({
 
 
 
-  const [formData, setFormData] = useState<QAFormData>({
+  const [formData, setFormData] = useState<QaDetails>({
     material_details: "",
     processed_date: new Date().toISOString().split("T")[0],
     shift: "",
@@ -89,19 +62,32 @@ const QAForm: React.FC<QAFormProps> = ({
   });
 
 
+  // const programmedMaterialIds = useMemo(() => {
+  //   const set = new Set<number>();
+  //   program.forEach((p) => {
+  //     if (p.material_details) {
+  //       set.add(
+  //         typeof p.material_details === "object"
+  //           ? p.material_details
+  //           : p.material_details
+  //       );
+  //     }
+  //   });
+  //   return set;
+  // }, [program]);
+
   const programmedMaterialIds = useMemo(() => {
     const set = new Set<number>();
-    program.forEach((p: QAData) => {
-      if (p.material_details) {
-        set.add(
-          typeof p.material_details === "object"
-            ? p.material_details
-            : p.material_details
-        );
+
+    program_details.forEach((p) => {
+      if (typeof p.material_details === "number") {
+        set.add(p.material_details);
       }
     });
+
     return set;
-  }, [program]);
+  }, [program_details]);
+
 
   // Auto-select material if only one QA-pending material exists
   useEffect(() => {
@@ -292,7 +278,7 @@ const QAForm: React.FC<QAFormProps> = ({
   };
 
   const validateForm = () => {
-    const requiredFields: (keyof QAFormData)[] = [
+    const requiredFields: (keyof QaDetails)[] = [
       "material_details",
       "processed_date",
       "shift",

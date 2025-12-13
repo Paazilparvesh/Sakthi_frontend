@@ -12,8 +12,6 @@ const Dashboard: React.FC = () => {
     return role.charAt(0).toUpperCase() + role.slice(1) + ' Dashboard';
   };
 
-
-
   const roleCards = useMemo(() => {
 
     // Path mapping for each role

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Material } from "@/types/inward.type";
+import { Material, MachineLog, Operator, QaDetails } from "@/types/inward.type";
 import { useEffect } from "react";
 import { Edit, Trash2 } from "lucide-react";
 
@@ -15,15 +15,6 @@ interface Props {
   setSelectedMaterialId: (id: number | null) => void;
 }
 
-interface MachineRow {
-  machine: string;
-  date: string;
-  start: string;
-  end: string;
-  runtime: string;
-  operator: string;
-  air: string;
-}
 
 const QaEditForm: React.FC<Props> = ({
   productId,
@@ -33,16 +24,15 @@ const QaEditForm: React.FC<Props> = ({
 }) => {
   const selectedMaterial = materials.find((m) => m.id === selectedMaterialId);
 
-  const [qaData, setQaData] = useState<any>({
+  const [qaData, setQaData] = useState<QaDetails>({
     processed_date: "",
     shift: "",
     no_of_sheets: "",
     cycletime_per_sheet: "",
-    // total_cycle_time: "",
-    machines_used: [] as MachineRow[],
+    machines_used: [] as MachineLog[],
   });
 
-  const [machineForm, setMachineForm] = useState<MachineRow>({
+  const [machineForm, setMachineForm] = useState<MachineLog>({
     machine: "",
     date: "",
     start: "",
@@ -55,8 +45,8 @@ const QaEditForm: React.FC<Props> = ({
 
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [openModal, setOpenModal] = useState(false);
-  const [operators, setOperators] = useState<any[]>([]);
-  const [machines, setMachines] = useState<any[]>([]);
+  const [operators, setOperators] = useState([]);
+  const [machines, setMachines] = useState([]);
 
 
 
@@ -64,13 +54,13 @@ const QaEditForm: React.FC<Props> = ({
   const [status, setStatus] =
     useState<"idle" | "success" | "failed">("idle");
 
-  const updateQAField = (key: string, value: any) => {
-    setQaData((prev: any) => ({ ...prev, [key]: value }));
+  const updateQAField = (key: string, value) => {
+    setQaData((prev) => ({ ...prev, [key]: value }));
   };
 
   /* ---------------- ADD MACHINE ---------------- */
   const handleAddMachine = () => {
-    setQaData((prev: any) => ({
+    setQaData((prev) => ({
       ...prev,
       machines_used: [...prev.machines_used, machineForm],
     }));
@@ -95,7 +85,7 @@ const QaEditForm: React.FC<Props> = ({
     const updated = [...qaData.machines_used];
     updated[editIndex] = machineForm;
 
-    setQaData((prev: any) => ({ ...prev, machines_used: updated }));
+    setQaData((prev) => ({ ...prev, machines_used: updated }));
 
     setOpenModal(false);
     setEditIndex(null);
@@ -180,14 +170,12 @@ const QaEditForm: React.FC<Props> = ({
         console.log("🎯 QA DATA:", data);
 
         // Filter by material (because backend not filtering yet)
-        const match = data.find((item: any) => item.material_id === mId);
+        const match = data.find((item: QaDetails) => item.material_id === mId);
 
         if (!match) {
           console.log("❌ QA not found for material");
           return;
         }
-
-        console.log("✔ Matched QA:", match);
 
         setQaData({
           id: match.id,
@@ -216,7 +204,7 @@ const QaEditForm: React.FC<Props> = ({
         const data = await res.json();
         console.log("Operators:", data);
 
-        const parsed = data.map((op: any) => ({
+        const parsed = data.map((op: Operator) => ({
           id: op.id,
           name: op.operator_name,
         }));
@@ -239,7 +227,7 @@ const QaEditForm: React.FC<Props> = ({
         const data = await res.json();
         console.log("Machines:", data);
 
-        const parsed = data.map((mc: any) => ({
+        const parsed = data.map((mc) => ({
           id: mc.id,
           name: mc.machine_name,
         }));
@@ -354,7 +342,7 @@ const QaEditForm: React.FC<Props> = ({
               </tr>
             </thead>
             <tbody>
-              {qaData.machines_used.map((m: MachineRow, i: number) => (
+              {qaData.machines_used.map((m: MachineLog, i: number) => (
                 <tr key={i} className="hover:bg-gray-50">
                   <td className="border px-2 py-1">{m.machine}</td>
                   <td className="border px-2 py-1">{m.date}</td>
@@ -452,7 +440,7 @@ const QaEditForm: React.FC<Props> = ({
                             ? "time"
                             : "text"
                       }
-                      value={(machineForm as any)[key]}
+                      value={(machineForm as MachineLog)[key]}
                       onChange={(e) =>
                         setMachineForm((prev) => ({
                           ...prev,

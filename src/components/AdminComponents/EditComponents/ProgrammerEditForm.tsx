@@ -9,7 +9,7 @@ import {
     DialogFooter,
 } from "@/components/ui/dialog";
 
-import { Material } from "@/types/inward.type";
+import { Material, ProgramerDetails } from "@/types/inward.type";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -27,7 +27,7 @@ const ProgrammerEditForm: React.FC<Props> = ({
     setSelectedMaterialId,
 }) => {
 
-    const [formData, setFormData] = useState<any>({});
+    const [formData, setFormData] = useState<ProgramerDetails>({});
     const [loading, setLoading] = useState(false);
     const [confirmModal, setConfirmModal] = useState(false);
     const [resultModal, setResultModal] = useState(false);

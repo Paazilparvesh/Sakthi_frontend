@@ -1,8 +1,8 @@
 import React from "react";
 import { Eye } from "lucide-react";
-import { ProgramerTableProps } from "@/types/qa.type";
+import { ProgramerProps } from "@/types/inward.type.ts";
 
-const ProgramerList: React.FC<ProgramerTableProps> = ({ data, onView }) => {
+const ProgramerList: React.FC<ProgramerProps> = ({ data, onView }) => {
     return (
         <div className="overflow-x-auto w-full">
             {/* Desktop Table */}
@@ -10,7 +10,7 @@ const ProgramerList: React.FC<ProgramerTableProps> = ({ data, onView }) => {
                 <thead>
                     <tr className="border-b bg-slate-100 text-center">
                         <th className="px-2 py-2 border w-[7%]">S. No.</th>
-			<th className="px-2 py-2 border w-[7%]">Slip No.</th>
+                        <th className="px-2 py-2 border w-[7%]">Slip No.</th>
                         <th className="px-2 py-2 border w-[12%]">Date</th>
                         <th className="px-2 py-2 border w-[18%]">Company Name</th>
                         <th className="px-2 py-2 border w-[18%]">Customer Name</th>
@@ -29,7 +29,7 @@ const ProgramerList: React.FC<ProgramerTableProps> = ({ data, onView }) => {
                             className="hover:bg-slate-50 even:bg-gray-50 odd:bg-white transition-all border text-center text-sm"
                         >
                             <td className="px-4 py-3 border font-medium">{item.serial_number}</td>
-			    <td className="px-4 py-3 border font-medium">{item.inward_slip_number}</td>
+                            <td className="px-4 py-3 border font-medium">{item.inward_slip_number}</td>
                             <td className="px-4 py-3 border">{item.date}</td>
                             <td className="px-4 py-3 border text-left">{item.company_name}</td>
                             <td className="px-4 py-3 border text-left">{item.customer_name}</td>

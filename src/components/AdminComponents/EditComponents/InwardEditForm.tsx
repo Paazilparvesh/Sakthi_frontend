@@ -1,6 +1,6 @@
 import { Input } from "@/components/ui/input";
 import React, { useState, useEffect, useCallback } from "react";
-import { ProductType, Material } from "@/types/inward.type";
+import { Material, EditProps, Density } from "@/types/inward.type";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -12,19 +12,9 @@ import {
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-interface DensityType {
-    material_name: string;
-    density_value: number;
-}
-
-interface Props {
-    form: ProductType;
-    updateForm: (partial: Partial<ProductType>) => void;
-}
-
-const InwardEditForm: React.FC<Props> = ({ form, updateForm }) => {
+const InwardEditForm: React.FC<EditProps> = ({ product, updateForm }) => {
     const [loading, setLoading] = useState(false);
-    const [materialList, setMaterialList] = useState<DensityType[]>([]);
+    const [materialList, setMaterialList] = useState<Density[]>([]);
 
     const [confirmModal, setConfirmModal] = useState(false); // open before updating
     const [resultModal, setResultModal] = useState(false); // success/fail modal
@@ -88,7 +78,7 @@ const InwardEditForm: React.FC<Props> = ({ form, updateForm }) => {
      * Update material with validation + recalculation
      * ------------------------------------------------------------- */
     const updateMaterial = (index: number, patch: Partial<Material>) => {
-        const newMaterials = [...form.materials];
+        const newMaterials = [...product.materials];
         let updated = { ...newMaterials[index], ...patch };
 
         // Auto-assign density when mat_type changes
@@ -115,33 +105,33 @@ const InwardEditForm: React.FC<Props> = ({ form, updateForm }) => {
     const handleInwardUpdate = async () => {
         setLoading(true);
 
-        console.log("📦 SENDING FINAL CLEAN FORM:", form);
+        console.log("📦 SENDING FINAL CLEAN FORM:", product);
 
         const cleanedForm = {
-            product_id: form.product_id,
+            product_id: product.product_id,
             // ----------------------------
             // Product-level fields
             // ----------------------------
-            serial_number: form.serial_number,
-            inward_slip_number: form.inward_slip_number,
-            date: form.date,
-            worker_no: form.worker_no,
-            company_name: form.company_name,
-            customer_name: form.customer_name,
-            customer_dc_no: form.customer_dc_no,
-            contact_no: form.contact_no,
-            color: form.color,
+            serial_number: product.serial_number,
+            inward_slip_number: product.inward_slip_number,
+            date: product.date,
+            worker_no: product.worker_no,
+            company_name: product.company_name,
+            customer_name: product.customer_name,
+            customer_dc_no: product.customer_dc_no,
+            contact_no: product.contact_no,
+            color: product.color,
 
-            programer_status: form.programer_status ?? "pending",
-            qa_status: form.qa_status ?? "pending",
-            outward_status: form.outward_status ?? "pending",
+            programer_status: product.programer_status ?? "pending",
+            qa_status: product.qa_status ?? "pending",
+            outward_status: product.outward_status ?? "pending",
 
-            created_by: form.created_by, // username string
+            created_by: product.created_by, // username string
 
             // ----------------------------
             // Materials (loop)
             // ----------------------------
-            materials: form.materials.map((m) => ({
+            materials: product.materials.map((m) => ({
                 id: m.id,
                 mat_type: m.mat_type,
                 mat_grade: m.mat_grade,
@@ -166,7 +156,7 @@ const InwardEditForm: React.FC<Props> = ({ form, updateForm }) => {
 
 
         try {
-            const res = await fetch(`${API_URL}/api/update_product_details/${form.product_id}/`, {
+            const res = await fetch(`${API_URL}/api/update_product_details/${product.product_id}/`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(cleanedForm),
@@ -214,7 +204,7 @@ const InwardEditForm: React.FC<Props> = ({ form, updateForm }) => {
                     <label className="text-gray-600 text-sm mb-1">Serial No.</label>
                     <Input
                         className="bg-gray-100 border border-gray-300 shadow-sm cursor-not-allowed"
-                        value={form.serial_number ?? ""}
+                        value={product.serial_number ?? ""}
                         readOnly
                     />
                 </div>
@@ -224,7 +214,7 @@ const InwardEditForm: React.FC<Props> = ({ form, updateForm }) => {
                     <label className="text-gray-600 text-sm mb-1">Inward Slip No.</label>
                     <Input
                         className="bg-gray-50 border border-gray-300 shadow-sm"
-                        value={form.inward_slip_number ?? ""}
+                        value={product.inward_slip_number ?? ""}
                         onChange={(e) => {
                             const val = e.target.value;
                             if (!/^\d*$/.test(val)) return; // allow only digits
@@ -239,7 +229,7 @@ const InwardEditForm: React.FC<Props> = ({ form, updateForm }) => {
                     <Input
                         type="date"
                         className="bg-gray-50 border border-gray-300 shadow-sm"
-                        value={form.date ?? ""}
+                        value={product.date ?? ""}
                         onChange={(e) => updateForm({ date: e.target.value })}
                     />
                 </div>
@@ -249,7 +239,7 @@ const InwardEditForm: React.FC<Props> = ({ form, updateForm }) => {
                     <label className="text-gray-600 text-sm mb-1">Work Order No.</label>
                     <Input
                         className="bg-gray-50 border border-gray-300 shadow-sm"
-                        value={form.worker_no ?? ""}
+                        value={product.worker_no ?? ""}
                         onChange={(e) => updateForm({ worker_no: e.target.value })}
                     />
                 </div>
@@ -259,7 +249,7 @@ const InwardEditForm: React.FC<Props> = ({ form, updateForm }) => {
                     <label className="text-gray-600 text-sm mb-1">Company Name</label>
                     <Input
                         className="bg-gray-50 border border-gray-300 shadow-sm"
-                        value={form.company_name ?? ""}
+                        value={product.company_name ?? ""}
                         onChange={(e) => updateForm({ company_name: e.target.value })}
                     />
                 </div>
@@ -269,7 +259,7 @@ const InwardEditForm: React.FC<Props> = ({ form, updateForm }) => {
                     <label className="text-gray-600 text-sm mb-1">Customer Name</label>
                     <Input
                         className="bg-gray-50 border border-gray-300 shadow-sm"
-                        value={form.customer_name ?? ""}
+                        value={product.customer_name ?? ""}
                         onChange={(e) => updateForm({ customer_name: e.target.value })}
                     />
                 </div>
@@ -279,7 +269,7 @@ const InwardEditForm: React.FC<Props> = ({ form, updateForm }) => {
                     <label className="text-gray-600 text-sm mb-1">Customer Document No.</label>
                     <Input
                         className="bg-gray-50 border border-gray-300 shadow-sm"
-                        value={form.customer_dc_no ?? ""}
+                        value={product.customer_dc_no ?? ""}
                         onChange={(e) => updateForm({ customer_dc_no: e.target.value })}
                     />
                 </div>
@@ -289,7 +279,7 @@ const InwardEditForm: React.FC<Props> = ({ form, updateForm }) => {
                     <label className="text-gray-600 text-sm mb-1">Mobile No.</label>
                     <Input
                         className="bg-gray-50 border border-gray-300 shadow-sm"
-                        value={form.contact_no ?? ""}
+                        value={product.contact_no ?? ""}
                         maxLength={10}
                         onChange={(e) => {
                             const val = e.target.value;
@@ -309,7 +299,7 @@ const InwardEditForm: React.FC<Props> = ({ form, updateForm }) => {
                                 type="radio"
                                 name="color"
                                 value="yellow"
-                                checked={form.color === "yellow"}
+                                checked={product.color === "yellow"}
                                 onChange={(e) => updateForm({ color: e.target.value })}
                             />
                             <span>Yellow</span>
@@ -320,7 +310,7 @@ const InwardEditForm: React.FC<Props> = ({ form, updateForm }) => {
                                 type="radio"
                                 name="color"
                                 value="Quotation"
-                                checked={form.color === "Quotation"}
+                                checked={product.color === "Quotation"}
                                 onChange={(e) => updateForm({ color: e.target.value })}
                             />
                             <span>Quotation</span>
@@ -357,7 +347,7 @@ const InwardEditForm: React.FC<Props> = ({ form, updateForm }) => {
                     </thead>
 
                     <tbody>
-                        {form.materials.map((mat, index) => (
+                        {product.materials.map((mat, index) => (
                             <tr key={index} className="hover:bg-gray-50">
                                 <td className="border px-2">{index + 1}</td>
 

@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
-import { StepProgressBar } from '@/components/ReusableComponents/StepProgressBar';
 import { toast } from '@/hooks/use-toast';
-import { ProductType, Material } from '@/types/inward.type';
+import { Material, ProgramerDetails, ProgramerProps } from '@/types/inward.type';
 import {
   Dialog,
   DialogContent,
@@ -12,39 +11,7 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 
-interface ProgramerFormData {
-  product_details: number | string;
-  material_details: number | string;
-  program_no: string;
-  program_date: string;
-  processed_quantity: string;
-  balance_quantity: string;
-  processed_width?: string;
-  processed_length?: string;
-  used_weight: string;
-  number_of_sheets: string;
-  cut_length_per_sheet: string;
-  pierce_per_sheet: string;
-  processed_mins_per_sheet: string;
-  total_planned_hours: string;
-  total_meters: string;
-  total_piercing: string;
-  total_used_weight: string;
-  total_no_of_sheets: string;
-  remarks?: string;
-  created_by?: string;
-}
-
-interface ProgramerFormWrapperProps {
-  item: ProductType;
-  currentStep: number;
-  setCurrentStep: React.Dispatch<React.SetStateAction<number>>;
-  onBack?: () => void;
-  onSuccess?: () => void;
-}
-
-
-const ProgramerFormWrapper: React.FC<ProgramerFormWrapperProps> = ({
+const ProgramerFormWrapper: React.FC<ProgramerProps> = ({
   item,
   currentStep,
   setCurrentStep,
@@ -53,7 +20,10 @@ const ProgramerFormWrapper: React.FC<ProgramerFormWrapperProps> = ({
 }) => {
   const API_URL = import.meta.env.VITE_API_URL;
   const totalSteps = 2;
-  const materials: Material[] = item.materials || [];
+  const materials: Material[] = useMemo(() => {
+    return item.materials ?? [];
+  }, [item.materials]);
+
   const userName = localStorage.getItem('username');
 
   const allowOnlyNumbers = (value: string) =>
@@ -64,7 +34,7 @@ const ProgramerFormWrapper: React.FC<ProgramerFormWrapperProps> = ({
   const [selectedMaterialQty, setSelectedMaterialQty] = useState<number>(0);
 
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
-  const [formData, setFormData] = useState<ProgramerFormData>({
+  const [formData, setFormData] = useState<ProgramerDetails>({
     product_details: item.id,
     material_details: '',
     program_no: '',
@@ -155,42 +125,46 @@ const ProgramerFormWrapper: React.FC<ProgramerFormWrapperProps> = ({
   ]);
 
   // Auto-select material if only one is available
-useEffect(() => {
-  const pendingMats = materials.filter(
-    (mat) => mat.programer_status === "pending"
-  );
+  useEffect(() => {
+    const pendingMats = materials.filter(
+      (mat) => mat.programer_status === "pending"
+    );
 
-  if (pendingMats.length === 1) {
-    const single = pendingMats[0];
+    if (pendingMats.length === 1) {
+      const single = pendingMats[0];
 
-    setFormData((prev) => ({
-      ...prev,
-      material_details: single.id.toString(),
-      processed_quantity: "",
-      balance_quantity: single.quantity.toString(),
-    }));
+      setFormData((prev) => ({
+        ...prev,
+        material_details: single.id.toString(),
+        processed_quantity: "",
+        balance_quantity: single.quantity.toString(),
+      }));
 
-    setSelectedMaterialQty(Number(single.quantity));
+      setSelectedMaterialQty(Number(single.quantity));
 
-    // Set remaining material dimensions
-    setRemainingMaterial({
-      width: single.width?.toString() || "",
-      length: single.length?.toString() || "",
-      original_width: Number(single.width) || 0,
-      original_length: Number(single.length) || 0,
-    });
-  }
-}, [materials]);
+      // Set remaining material dimensions
+      setRemainingMaterial({
+        width: single.width?.toString() || "",
+        length: single.length?.toString() || "",
+        original_width: Number(single.width) || 0,
+        original_length: Number(single.length) || 0,
+      });
+    }
+  }, [materials]);
 
 
-  const recalculateTotals = (data: ProgramerFormData) => {
-    const num = (v: string) => Number(v) || 0;
+  const recalculateTotals = (data: ProgramerDetails) => {
+    const toNumber = (value: unknown): number => {
+      if (value === null || value === undefined || value === '') return 0;
+      const n = Number(value);
+      return Number.isFinite(n) ? n : 0;
+    };
 
-    const round3 = (num: number) => Number(num.toFixed(3));
+    const round3 = (value: number) => Number(value.toFixed(3));
 
-    const processedQty = num(data.processed_quantity);
-    const minsPerSheet = num(data.processed_mins_per_sheet);
-    const cutLength = num(data.cut_length_per_sheet);
+    const processedQty = toNumber(data.processed_quantity);
+    const minsPerSheet = toNumber(data.processed_mins_per_sheet);
+    const cutLength = toNumber(data.cut_length_per_sheet);
 
     // Total minutes
     const totalMinutes = Math.round(processedQty * minsPerSheet);
@@ -205,9 +179,18 @@ useEffect(() => {
     const totalMeters = round3(
       processedQty < 1 ? cutLength : processedQty * cutLength
     );
-    const totalPiercing = round3(processedQty * num(data.pierce_per_sheet));
-    const totalWeight = round3(processedQty * num(data.used_weight));
-    const totalSheet = round3(processedQty * num(data.number_of_sheets));
+
+    const totalPiercing = round3(
+      processedQty * toNumber(data.pierce_per_sheet)
+    );
+
+    const totalWeight = round3(
+      processedQty * toNumber(data.used_weight)
+    );
+
+    const totalSheet = round3(
+      processedQty * toNumber(data.number_of_sheets)
+    );
 
     return {
       total_piercing: totalPiercing.toString(),
@@ -218,6 +201,7 @@ useEffect(() => {
     };
   };
 
+
   const handleValidateAll = () => {
     const fieldsToCheck = Object.keys(formData).filter(
       (k) => !['product_details', 'created_by', 'remarks'].includes(k)
@@ -227,7 +211,7 @@ useEffect(() => {
     fieldsToCheck.forEach((key) => {
       const error = validateField(
         key,
-        String(formData[key as keyof ProgramerFormData])
+        String(formData[key as keyof ProgramerDetails])
       );
       if (error) hasError = true;
     });
@@ -248,7 +232,7 @@ useEffect(() => {
     let error = '';
 
     if (!value.trim()) {
-      error = `${LABELS[name as keyof ProgramerFormData]} is required.`;
+      error = `${LABELS[name as keyof ProgramerDetails]} is required.`;
     } else if (
       [
         'processed_quantity',
@@ -265,7 +249,7 @@ useEffect(() => {
       ].includes(name) &&
       isNaN(Number(value))
     ) {
-      error = `${LABELS[name as keyof ProgramerFormData]} must be a number.`;
+      error = `${LABELS[name as keyof ProgramerDetails]} must be a number.`;
     }
 
     if (
@@ -297,7 +281,7 @@ useEffect(() => {
       ['program_no', 'program_date'].forEach((key) => {
         const error = validateField(
           key,
-          String(formData[key as keyof ProgramerFormData])
+          String(formData[key as keyof ProgramerDetails])
         );
         if (error) hasError = true;
       });
@@ -319,7 +303,7 @@ useEffect(() => {
       fieldsToCheck.forEach((key) => {
         const error = validateField(
           key,
-          String(formData[key as keyof ProgramerFormData])
+          String(formData[key as keyof ProgramerDetails])
         );
         if (error) hasError = true;
       });
@@ -553,7 +537,9 @@ useEffect(() => {
   };
 
   // --- Field Label Map for Readable Names
-  const LABELS: Record<keyof ProgramerFormData, string> = {
+  const LABELS: Record<keyof ProgramerDetails, string> = {
+    id: "id",
+    product_id: "Product id",
     product_details: 'Product ID',
     material_details: 'Material ID',
     program_no: 'Programer Number',
@@ -576,6 +562,7 @@ useEffect(() => {
     total_no_of_sheets: 'Total No.of Comp. per  Sheets',
     remarks: 'Remarks',
     created_by: 'Created By',
+    status: "Status",
   };
 
 
@@ -651,16 +638,16 @@ useEffect(() => {
                       htmlFor={key}
                       className='text-sm font-medium text-gray-700'
                     >
-                      {LABELS[key as keyof ProgramerFormData]}
+                      {LABELS[key as keyof ProgramerDetails]}
                     </label>
                     <input
                       type={key === 'program_date' ? 'date' : 'text'}
                       name={key}
                       id={key}
-                      value={formData[key as keyof ProgramerFormData]}
+                      value={formData[key as keyof ProgramerDetails]}
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      placeholder={LABELS[key as keyof ProgramerFormData]}
+                      placeholder={LABELS[key as keyof ProgramerDetails]}
                       className={`border rounded-lg px-3 py-2 focus:ring-2 focus:outline-none ${formErrors[key]
                         ? 'border-red-500 focus:ring-red-400'
                         : 'border-gray-300 focus:ring-blue-500'

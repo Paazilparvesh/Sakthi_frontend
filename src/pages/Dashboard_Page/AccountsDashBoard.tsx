@@ -157,13 +157,13 @@ const AccountsDashboard: React.FC = () => {
     currentProduct?.outward_status?.toLowerCase() === "pending";
 
   const programMap = useMemo(() => {
-  const map: Record<number, string> = {};
-  program.forEach(p => {
-    const id = typeof p.material_details === "object" ? p.material_details.id : p.material_details;
-    map[id] = p.program_date;
-  });
-  return map;
-}, [program]);
+    const map: Record<number, string> = {};
+    program.forEach(p => {
+      const id = typeof p.material_details === "object" ? p.material_details.id : p.material_details;
+      map[id] = p.program_date;
+    });
+    return map;
+  }, [program]);
 
 
   const headerTitle = React.useMemo(() => {

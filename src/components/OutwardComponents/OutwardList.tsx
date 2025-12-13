@@ -1,22 +1,13 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ProductType } from '@/types/inward.type';
+import { OutwardProps } from '@/types/inward.type';
 import { useLocation } from 'react-router-dom';
-
 import { Eye } from "lucide-react";
 
-interface ProductListProps {
-  product: ProductType[];
-  onView: (p: ProductType) => void;
-  getStatusColor: (status: string) => string;
-  role: string;
-}
-
-export const OutwardList: React.FC<ProductListProps> = ({
+export const OutwardList: React.FC<OutwardProps> = ({
   product,
   onView,
-  role,
   getStatusColor,
 }) => {
   const location = useLocation();
@@ -44,38 +35,38 @@ export const OutwardList: React.FC<ProductListProps> = ({
           </tr>
         </thead>
         <tbody>
-          {product.map((p, i) => (
+          {product.map((item, i) => (
             <tr
               key={i}
               className='hover:bg-slate-50 even:bg-gray-50 odd:bg-white transition-all border text-center text-sm'
             >
               <td className='px-4 py-1 border text-center'>
-                {p.serial_number}
+                {item.serial_number}
               </td>
-              <td className='px-4 py-2 border'>{p.inward_slip_number}</td>
-              <td className='px-4 py-2 border'>{p.company_name}</td>
-              <td className='px-4 py-2 border'>{p.customer_name}</td>
-              <td className='px-4 py-2 border text-center'>{p.date}</td>
-              <td className='px-4 py-2 border text-center'>{p.color}</td>
+              <td className='px-4 py-2 border'>{item.inward_slip_number}</td>
+              <td className='px-4 py-2 border'>{item.company_name}</td>
+              <td className='px-4 py-2 border'>{item.customer_name}</td>
+              <td className='px-4 py-2 border text-center'>{item.date}</td>
+              <td className='px-4 py-2 border text-center'>{item.color}</td>
               <td className='px-4 py-2 border text-center'>
-                {p.created_by || 'Unknown'}
+                {item.created_by || 'Unknown'}
               </td>
               <td className='px-4 py-2 border text-center'>
-                <Badge className={getStatusColor(p.qa_status)}>
-                  {p.qa_status}
+                <Badge className={getStatusColor(item.qa_status)}>
+                  {item.qa_status}
                 </Badge>
               </td>
               {isAccountantPage && (
                 <td className='px-4 py-2 border text-center'>
-                  <Badge className={getStatusColor(p.outward_status)}>
-                    {p.outward_status}
+                  <Badge className={getStatusColor(item.outward_status)}>
+                    {item.outward_status}
                   </Badge>
                 </td>
               )}
               <td className='px-4 py-2 border text-center'>
                 <button
                   className='bg-blue-800 text-white px-3 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-1 mx-auto'
-                  onClick={() => onView(p)}
+                  onClick={() => onView(item)}
                 >
                   <Eye className="h-4 w-4" /> View
                 </button>

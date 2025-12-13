@@ -2,67 +2,10 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Card, CardContent } from '@/components/ui/card';
-import { ProductType } from '@/types/inward.type';
+import { ProgramerDetails, QaDetails, AccountDetails, OutwardDetailProps } from '@/types/inward.type';
 import { useToast } from '@/components/ui/use-toast';
 
-/* ---------------------- Interfaces ---------------------- */
-interface ProgramerDetail {
-  id: number;
-  created_by: string;
-  program_no: string;
-  program_date: string;
-  processed_quantity: number;
-  balance_quantity: number;
-  used_weight: number;
-  number_of_sheets: number;
-  cut_length_per_sheet: number;
-  pierce_per_sheet: number;
-  processed_mins_per_sheet: number;
-  total_planned_hours: number;
-  total_meters: number;
-  total_piercing: number;
-  total_used_weight: number;
-  total_no_of_sheets: number;
-  product_details: number;
-  material_details: number | null;
-}
 
-interface QaDetail {
-  id: number;
-  processed_date: string;
-  shift: string;
-  no_of_sheets: number;
-  cycletime_per_sheet: number;
-  total_cycle_time: number;
-  machines_used: {
-    machine: string;
-    date: string;
-    start: string;
-    end: string;
-    runtime: string;
-    air: string;
-    operator: string;
-  }[];
-  product_id: number;
-  material_id: number;
-  created_by: string;
-}
-
-interface AccDetail {
-  acc_detail_id: number;
-  product_id: number;
-  material_id: number;
-  invoice_no: string;
-  status: string;
-  remarks: string;
-  created_by: string;
-}
-
-interface OutwardDetailProps {
-  product: ProductType;
-  program?: ProgramerDetail[];
-  getStatusColor: (status: string) => string;
-}
 
 /* ---------------------- Helper Components ---------------------- */
 const renderFieldCard = (
@@ -81,9 +24,8 @@ const renderFieldCard = (
 
   return (
     <Card
-      className={`shadow-sm rounded-lg border ${
-        isStatus ? 'border-transparent' : 'border-gray-200'
-      }`}
+      className={`shadow-sm rounded-lg border ${isStatus ? 'border-transparent' : 'border-gray-200'
+        }`}
     >
       <CardContent className='p-4'>
         <span className='text-gray-500 font-medium text-sm'>{label}</span>
@@ -102,15 +44,15 @@ const OutwardDetail: React.FC<OutwardDetailProps> = ({ product }) => {
   const BASE_URL = import.meta.env.VITE_API_URL;
   const { toast } = useToast();
   // 🔹 States
-  const [qa, setQa] = useState<QaDetail[]>([]);
-  const [acc, setAcc] = useState<AccDetail[]>([]);
+  const [qa, setQa] = useState<QaDetails[]>([]);
+  const [acc, setAcc] = useState<AccountDetails[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingID, setLoadingID] = useState<number | null>(null);
   const [selectedMaterialId, setSelectedMaterialId] = useState<number | null>(
     null
   );
   const [materialDataMap, setMaterialDataMap] = useState<
-    Record<number, ProgramerDetail>
+    Record<number, ProgramerDetails>
   >({});
 
   /* ---------------------- Fetch QA + Account ---------------------- */
@@ -123,8 +65,8 @@ const OutwardDetail: React.FC<OutwardDetailProps> = ({ product }) => {
       ]);
       if (!qaRes.ok || !accRes.ok) throw new Error('Failed to fetch data');
 
-      const qaData: QaDetail[] = await qaRes.json();
-      const accData: AccDetail[] = await accRes.json();
+      const qaData: QaDetails[] = await qaRes.json();
+      const accData: AccountDetails[] = await accRes.json();
 
       setQa(qaData.reverse());
       setAcc(accData.reverse());
@@ -322,8 +264,8 @@ const OutwardDetail: React.FC<OutwardDetailProps> = ({ product }) => {
                           {loadingID === mat.id
                             ? 'Loading...'
                             : selectedMaterialId === mat.id
-                            ? 'Hide'
-                            : 'View'}
+                              ? 'Hide'
+                              : 'View'}
                         </Button>
                       </td>
                     )}
@@ -405,33 +347,6 @@ const OutwardDetail: React.FC<OutwardDetailProps> = ({ product }) => {
                         {qa.total_cycle_time}
                       </td>
                       <td className='border px-2 py-2'>{qa.created_by}</td>
-
-                      {/* Machines used */}
-                      {/* <td className='border px-2 py-2'>
-                        {qa.machines_used?.length > 0 ? (
-                          <ul className='space-y-1 text-left'>
-                            {qa.machines_used.map((m, idx) => (
-                              <li
-                                key={idx}
-                                className='flex justify-between bg-gray-100 px-2 py-1 rounded'
-                              >
-                                <span className='font-medium'>{m.machine}</span>
-                                <span className='border'>{m.date} date</span>
-                                <span className='border'>{m.start}start</span>
-                                <span className='border'>{m.end}end</span>
-                                <span className='border'>{m.runtime}Runtime</span>
-                                <span className='border'>{m.air}Air</span>
-                                <span className='border'>{m.operator}Operator</span>
-                             
-                              </li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <span className='italic text-gray-500'>
-                            No machines
-                          </span>
-                        )}
-                      </td> */}
                     </tr>
                   ))}
                 </tbody>
@@ -443,7 +358,7 @@ const OutwardDetail: React.FC<OutwardDetailProps> = ({ product }) => {
             {selectedMaterialQaDetails.map((qa) => (
               <React.Fragment key={qa.id}>
                 <tr className='hover:bg-gray-50 text-gray-800 w-full'>
-                 
+
                   <td className='border px-2 py-2 w-full'>
                     {qa.machines_used.length > 0 ? (
                       <table className='w-full border-collapse text-sm'>
@@ -510,7 +425,7 @@ const OutwardDetail: React.FC<OutwardDetailProps> = ({ product }) => {
 
               <tbody>
                 {selectedMaterialAccDetails.map((acc) => (
-                  <tr key={acc.acc_detail_id} className='hover:bg-gray-50'>
+                  <tr key={acc.id} className='hover:bg-gray-50'>
                     <td className='px-4 py-3 border'>{acc.invoice_no}</td>
                     <td className='px-4 py-3 border'>{acc.status}</td>
                     <td className='px-4 py-3 border'>{acc.remarks}</td>

@@ -12,16 +12,14 @@ import {
     DialogFooter,
 } from "@/components/ui/dialog";
 
+import { Density } from "@/types/inward.type";
+
 import { Loader2, Plus, Pencil, Trash2 } from "lucide-react";
 
-interface MaterialType {
-    id: number;
-    material_name: string;
-    density_value: number;
-}
+
 
 const AdminMaterials: React.FC = () => {
-    const [materials, setMaterials] = useState<MaterialType[]>([]);
+    const [materials, setMaterials] = useState<Density[]>([]);
     const [loading, setLoading] = useState(false);
 
     // Add Modal State
@@ -32,11 +30,11 @@ const AdminMaterials: React.FC = () => {
 
     // Edit Modal State
     const [editModalOpen, setEditModalOpen] = useState(false);
-    const [editItem, setEditItem] = useState<MaterialType | null>(null);
+    const [editItem, setEditItem] = useState<Density | null>(null);
 
     // Delete Modal State
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-    const [deleteItem, setDeleteItem] = useState<MaterialType | null>(null);
+    const [deleteItem, setDeleteItem] = useState<Density | null>(null);
 
     const { toast } = useToast();
     const API_URL = import.meta.env.VITE_API_URL;
@@ -103,7 +101,7 @@ const AdminMaterials: React.FC = () => {
     };
 
     // Open Edit Modal
-    const openEditModal = (item: MaterialType) => {
+    const openEditModal = (item: Density) => {
         setEditItem(item);
         setMaterialName(item.material_name);
         setDensity(item.density_value.toString());
@@ -145,7 +143,7 @@ const AdminMaterials: React.FC = () => {
     };
 
     // Open Delete Modal
-    const openDeleteModal = (item: MaterialType) => {
+    const openDeleteModal = (item: Density) => {
         setDeleteItem(item);
         setDeleteModalOpen(true);
     };

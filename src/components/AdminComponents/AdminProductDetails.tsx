@@ -2,20 +2,17 @@ import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
-  AccountDetails,
-  Material,
   ProductType,
-  QaDetails,
 } from '@/types/inward.type';
 
 /* ---------------------- Props ---------------------- */
 interface AdminProductDetailProps {
-  product: ProductType; // from get_overall_details API
+  product: ProductType;
   onBack: () => void;
   onEdit: (product: ProductType) => void;
 }
 
-/* ---------------------- Helper Function ---------------------- */
+/*  Helper Function  */
 const renderFieldCard = (
   label: string,
   value: string | number | null | undefined,
@@ -48,7 +45,7 @@ const renderFieldCard = (
   );
 };
 
-/* ---------------------- Main Component ---------------------- */
+/*  Main Component  */
 const AdminProductDetail: React.FC<AdminProductDetailProps> = ({
   product,
   onBack,

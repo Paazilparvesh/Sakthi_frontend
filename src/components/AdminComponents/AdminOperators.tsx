@@ -13,11 +13,8 @@ import {
 import { Label } from "@/components/ui/label";
 import { Loader2, UserPlus, Pencil, Trash2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { Operator } from "@/types/inward.type";
 
-interface Operator {
-  id: number;
-  operator_name: string;
-}
 
 const AdminOperators: React.FC = () => {
   const API_URL = import.meta.env.VITE_API_URL;
