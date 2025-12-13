@@ -28,6 +28,22 @@ const AdminProducts: React.FC = () => {
     const [rowsPerPage, setRowsPerPage] = useState<number | string>(10);
 
     const [editingProduct, setEditingProduct] = useState<ProductType | null>(null);
+    const [sortConfig, setSortConfig] = useState<{ key: string; direction: "asc" | "desc" } | null>(null);
+
+
+    const handleSort = (key: string) => {
+        setSortConfig((prev) => {
+            if (prev?.key === key) {
+                // toggle direction
+                return {
+                    key,
+                    direction: prev.direction === "asc" ? "desc" : "asc"
+                };
+            }
+            return { key, direction: "asc" };
+        });
+    };
+
 
 
     /* ---------------------------------------------------- */
@@ -179,15 +195,30 @@ const AdminProducts: React.FC = () => {
     /* ---------------------------------------------------- */
     /* PAGINATION */
 
+    const sortedDetails = React.useMemo(() => {
+        if (!sortConfig) return filteredDetails;
+
+        return [...filteredDetails].sort((a, b) => {
+            const aVal = String(a[sortConfig.key] ?? "").toLowerCase();
+            const bVal = String(b[sortConfig.key] ?? "").toLowerCase();
+
+            if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
+            if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
+            return 0;
+        });
+
+    }, [filteredDetails, sortConfig]);
+
+
 
     const paginatedData = React.useMemo(() => {
-        if (rowsPerPage === "all") return filteredDetails;
+        if (rowsPerPage === "all") return sortedDetails;
 
         const limit = Number(rowsPerPage);      // Convert safely to number
         const start = (currentPage - 1) * limit;
 
-        return filteredDetails.slice(start, start + limit);
-    }, [filteredDetails, currentPage, rowsPerPage]);
+        return sortedDetails.slice(start, start + limit);
+    }, [sortedDetails, currentPage, rowsPerPage]);
 
 
     const totalPages = rowsPerPage === "all"
@@ -262,12 +293,6 @@ const AdminProducts: React.FC = () => {
                     </select>
 
                     {/* Action Buttons */}
-                    {/* {selectedIds.length > 0 && (
-                        <div className="flex gap-2">
-                            <Button className="bg-blue-600 text-white" onClick={handleExport}>
-                                Export
-                            </Button>
-                        </div> */}
                     {selectedIds.length > 0 && (
                         <div className="flex items-center gap-4">
 
@@ -283,7 +308,6 @@ const AdminProducts: React.FC = () => {
                         </div>
                     )}
 
-                    {/* )} */}
                 </div>
             </div>
 
@@ -304,9 +328,61 @@ const AdminProducts: React.FC = () => {
                                         onChange={handleSelectAll}
                                     />
                                 </th>
-                                <th className="border px-4 py-2">Serial No.</th>
-                                <th className="border px-4 py-2">Slip No.</th>
-                                <th className="border px-4 py-2">Date</th>
+                                <th
+                                    className="border px-4 py-2 cursor-pointer select-none"
+                                    onClick={() => handleSort("serial_number")}
+                                >
+                                    <div className="flex items-center justify-center gap-1">
+                                        Serial No.
+
+                                        {sortConfig?.key === "serial_number" ? (
+                                            sortConfig.direction === "asc" ? (
+                                                <span className="text-gray-600">↑</span>
+                                            ) : (
+                                                <span className="text-gray-600">↓</span>
+                                            )
+                                        ) : (
+                                            <span className="text-gray-400">↕</span>
+                                        )}
+                                    </div>
+                                </th>
+                                <th
+                                    className="border px-4 py-2 cursor-pointer select-none"
+                                    onClick={() => handleSort("inward_slip_number")}
+                                >
+                                    <div className="flex items-center justify-center gap-1">
+                                        Slip No.
+
+                                        {sortConfig?.key === "inward_slip_number" ? (
+                                            sortConfig.direction === "asc" ? (
+                                                <span className="text-gray-600">↑</span>
+                                            ) : (
+                                                <span className="text-gray-600">↓</span>
+                                            )
+                                        ) : (
+                                            <span className="text-gray-400">↕</span>
+                                        )}
+                                    </div>
+                                </th>
+                                {/* <th className="border px-4 py-2">Date</th> */}
+                                <th
+                                    className="border px-4 py-2 cursor-pointer select-none"
+                                    onClick={() => handleSort("date")}
+                                >
+                                    <div className="flex items-center justify-center gap-1">
+                                        Date
+
+                                        {sortConfig?.key === "date" ? (
+                                            sortConfig.direction === "asc" ? (
+                                                <span className="text-gray-600">↑</span>
+                                            ) : (
+                                                <span className="text-gray-600">↓</span>
+                                            )
+                                        ) : (
+                                            <span className="text-gray-400">↕</span>
+                                        )}
+                                    </div>
+                                </th>
                                 <th className="border px-4 py-2">Company</th>
                                 <th className="border px-4 py-2">Customer</th>
                                 <th className="border px-4 py-2">Color</th>

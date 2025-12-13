@@ -43,6 +43,8 @@ export interface Material {
   stock_due: number | string;
   remarks: string;
 
+  planned_qty?: number;
+
   programer_status?: string;
   qa_status?: string;
   acc_status?: string;
@@ -55,7 +57,7 @@ export interface Material {
 
 export interface ProgramerDetails {
   id: number;
-  program_no: string;
+  program_no: string | number;
   program_date: string;
   processed_quantity?: number;
   balance_quantity?: number;
@@ -80,25 +82,11 @@ export interface QaDetails {
   processed_date: string;
   shift: string;
   no_of_sheets: number;
-  cycletime_per_sheet: string;
-  total_cycle_time: string;
-  operator_name: string;
-  machines_used: string;
+  cycletime_per_sheet: number;
+  total_cycle_time: number;
+  machines_used: QaMachineLog[];
   created_by: string;
 }
-
-export interface Company {
-  id: number;
-  company_name: string;
-  customer_name: string;
-  company_address: string;
-  contact_no: string;
-  company_email: string;
-  customer_dc_no: string;
-}
-
-
-
 
 export interface AccountDetails {
   id: number;
