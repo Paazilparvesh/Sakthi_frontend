@@ -29,9 +29,8 @@ const renderFieldCard = (
 
   return (
     <Card
-      className={`shadow-sm rounded-lg border ${
-        isStatus ? 'border-transparent' : 'border-gray-200'
-      }`}
+      className={`shadow-sm rounded-lg border ${isStatus ? 'border-transparent' : 'border-gray-200'
+        }`}
     >
       <CardContent className='p-4'>
         <span className='text-gray-500 font-medium text-sm'>{label}</span>
@@ -218,7 +217,7 @@ const AdminProductDetail: React.FC<AdminProductDetailProps> = ({
                 </h4>
 
                 {Array.isArray(mat.programer_details) &&
-                mat.programer_details.length > 0 ? (
+                  mat.programer_details.length > 0 ? (
                   <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4'>
                     {mat.programer_details.map((prog) =>
                       Object.entries(prog).map(([key, value]) => {
@@ -307,7 +306,7 @@ const AdminProductDetail: React.FC<AdminProductDetailProps> = ({
                               >
                                 {/* {qa.machines_used.length > 0 ? ( */}
                                 {Array.isArray(qa.machines_used) &&
-                                qa.machines_used.length > 0 ? (
+                                  qa.machines_used.length > 0 ? (
                                   <table className='w-full border-collapse text-sm'>
                                     <thead>
                                       <tr className='bg-slate-200 text-center'>
@@ -389,7 +388,7 @@ const AdminProductDetail: React.FC<AdminProductDetailProps> = ({
                 </h4>
 
                 {Array.isArray(mat.account_details) &&
-                mat.account_details.length > 0 ? (
+                  mat.account_details.length > 0 ? (
                   <table className='min-w-full border text-sm'>
                     <thead className='bg-gray-100 text-gray-700'>
                       <tr>

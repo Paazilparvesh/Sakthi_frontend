@@ -14,7 +14,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 const InwardEditForm: React.FC<EditProps> = ({ product, updateForm }) => {
 
-    
+
     const [loading, setLoading] = useState(false);
     const [materialList, setMaterialList] = useState<Density[]>([]);
 
@@ -181,7 +181,7 @@ const InwardEditForm: React.FC<EditProps> = ({ product, updateForm }) => {
         setLoading(false);
     };
 
-            // Early return if no product data
+    // Early return if no product data
     if (!product || !product.serial_number) {
         return <div>Loading product data...</div>;
     }

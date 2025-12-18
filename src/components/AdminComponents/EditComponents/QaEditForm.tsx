@@ -129,16 +129,16 @@ const QaEditForm: React.FC<Props> = ({
 
     setLoading(false);
 
- 
 
-  if (res.ok) {
-  setStatus('success');
-  setShowSuccessPopup(true);
-  setShowConfirm(false); // close confirm modal
-} else {
-  setStatus('failed');
-}
-};
+
+    if (res.ok) {
+      setStatus('success');
+      setShowSuccessPopup(true);
+      setShowConfirm(false); // close confirm modal
+    } else {
+      setStatus('failed');
+    }
+  };
 
 
   useEffect(() => {
@@ -295,8 +295,8 @@ const QaEditForm: React.FC<Props> = ({
                     key === 'processed_date'
                       ? 'date'
                       : key === 'shift'
-                      ? 'text'
-                      : 'number'
+                        ? 'text'
+                        : 'number'
                   }
                   min={
                     key !== 'processed_date' && key !== 'shift' ? 0 : undefined
@@ -304,7 +304,7 @@ const QaEditForm: React.FC<Props> = ({
                   value={
                     key === 'total_cycle_time'
                       ? Number(qaData.no_of_sheets) *
-                          Number(qaData.cycletime_per_sheet) || 0
+                      Number(qaData.cycletime_per_sheet) || 0
                       : qaData[key] || ''
                   }
                   readOnly={key === 'total_cycle_time'}
@@ -346,10 +346,10 @@ const QaEditForm: React.FC<Props> = ({
                   <td className='border px-2 py-1'>{m.end}</td>
                   <td className='border px-2 py-1'>{m.runtime}</td>
                   <td className='border px-2 py-1'>{m.operator}</td>
-                  <td className='border px-2 py-1'>{m.air}</td>
+                  <td className='border px-2 py-1'>{m.air ?? "N/A"}</td>
                   <td className='border px-2 py-1 flex gap-2 justify-center'>
                     <button
-                      className='p-2 rounded-md bg-yellow-500 hover:bg-yellow-600 text-white'
+                      className='p-2 rounded-md bg-green-600 hover:bg-green-700 text-white flex items-center gap-2 px-3 py-1'
                       onClick={() => {
                         setMachineForm({
                           ...m,
@@ -359,7 +359,7 @@ const QaEditForm: React.FC<Props> = ({
                         setOpenModal(true);
                       }}
                     >
-                      <Edit size={16} />
+                      <Edit size={16} /> Edit
                     </button>
                   </td>
                 </tr>
@@ -367,7 +367,7 @@ const QaEditForm: React.FC<Props> = ({
             </tbody>
           </table>
 
-        
+
         </div>
       )}
 
@@ -431,8 +431,8 @@ const QaEditForm: React.FC<Props> = ({
                           : key === 'start' ||
                             key === 'end' ||
                             key === 'runtime'
-                          ? 'time'
-                          : 'text'
+                            ? 'time'
+                            : 'text'
                       }
                       value={(machineForm as MachineLog)[key] ?? ''}
                       disabled={
@@ -441,13 +441,13 @@ const QaEditForm: React.FC<Props> = ({
                       }
                       placeholder={
                         key === 'air' &&
-                        !(machineForm.air && machineForm.air.trim())
+                          !(machineForm.air && machineForm.air.trim())
                           ? 'No air input for this machine'
                           : ''
                       }
                       className={
                         key === 'air' &&
-                        !(machineForm.air && machineForm.air.trim())
+                          !(machineForm.air && machineForm.air.trim())
                           ? 'bg-gray-100 cursor-not-allowed'
                           : ''
                       }
@@ -510,34 +510,34 @@ const QaEditForm: React.FC<Props> = ({
               >
                 Confirm
               </Button>
-              
+
             </div>
 
-            
+
           </div>
         </div>
       )}
 
       {showSuccessPopup && (
-  <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-    <div className="bg-white rounded-xl p-6 w-full max-w-sm shadow-xl text-center animate-in zoom-in-95">
-      <h3 className="text-xl font-semibold text-green-600 mb-2">
-        ✅ QA Updated Successfully
-      </h3>
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-sm shadow-xl text-center animate-in zoom-in-95">
+            <h3 className="text-xl font-semibold text-green-600 mb-2">
+              QA Updated Successfully
+            </h3>
 
-      <p className="text-gray-600 mb-6">
-        QA details have been updated successfully.
-      </p>
+            <p className="text-gray-600 mb-6">
+              QA details have been updated successfully.
+            </p>
 
-      <Button
-        className="bg-green-600 text-white hover:bg-green-700"
-        onClick={() => setShowSuccessPopup(false)}
-      >
-        OK
-      </Button>
-    </div>
-  </div>
-)}
+            <Button
+              className="bg-green-600 text-white hover:bg-green-700"
+              onClick={() => setShowSuccessPopup(false)}
+            >
+              OK
+            </Button>
+          </div>
+        </div>
+      )}
 
     </div>
   );

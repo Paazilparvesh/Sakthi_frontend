@@ -11,7 +11,6 @@ import {
 import { OutwardProps } from '@/types/inward.type';
 
 interface AccountFormData {
-  // material_details: string;
   material_details: number[];
 
   invoice_no: string;
@@ -32,7 +31,6 @@ const AccountForm: React.FC<OutwardProps> = ({
   const { toast } = useToast();
 
   const [formData, setFormData] = useState<AccountFormData>({
-    // material_details: "",
     material_details: [],
 
     invoice_no: '',
@@ -51,29 +49,7 @@ const AccountForm: React.FC<OutwardProps> = ({
   const parsedUser = stored ? JSON.parse(stored) : null;
   const user_name = parsedUser?.username;
 
-  /* 🔹 Load Program Date when material changes */
-  // useEffect(() => {
-  //   const fetchProgramDate = async () => {
-  //     if (!formData.material_details) return;
-
-  //     try {
-  //       const res = await fetch(
-  //         `${API_URL}/api/get_programer_Details/?material_id=${formData.material_details}`
-  //       );
-  //       const data = await res.json();
-  //       if (Array.isArray(data) && data.length > 0) {
-  //         setProgramDate(data[0].program_date || '');
-  //       }
-  //     } catch (error) {
-  //       console.error('⚠️ Failed to fetch program date', error);
-  //     }
-  //   };
-
-  //   fetchProgramDate();
-  // }, [formData.material_details, API_URL]);
-
   // ✅ Handle Input Changes + Realtime Validation
-
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -100,24 +76,6 @@ const AccountForm: React.FC<OutwardProps> = ({
     setFormData(updated);
     validateField(name, value);
   };
-
-  // ✅ Field-Level Validation
-  //   const validateField = (name: string, value: string) => {
-  //     let error = '';
-  //     // if (name === "material_details" && !value.trim()) error = "Please select a material.";
-  //     if (name === 'material_details' && formData.material_details.length === 0) {
-  //       error = 'Please select at least one material.';
-  //     }
-
-  //     if (name === 'invoice_no' && !value.trim())
-  //       error = 'Invoice number is required.';
-  //     if (name === 'status' && !value.trim()) error = 'Please select a status.';
-  //     if (name === 'remarks' && value.trim().length < 3)
-  //       error = 'Remark must be at least 3 characters long.';
-
-  //     setFormErrors((prev) => ({ ...prev, [name]: error }));
-  //     return error;
-  //   };
 
   const validateField = (name: string, value: any) => {
     let error = "";
@@ -227,56 +185,6 @@ const AccountForm: React.FC<OutwardProps> = ({
       setShowConfirm(false);
     }
   };
-
-  // const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const value = Number(e.target.value);
-
-  //   setFormData((prev) => {
-  //     let updatedMaterials;
-
-  //     if (prev.material_details.includes(value)) {
-  //       // Remove if unchecked
-  //       updatedMaterials = prev.material_details.filter((id) => id !== value);
-  //     } else {
-  //       // Add if checked
-  //       updatedMaterials = [...prev.material_details, value];
-  //     }
-
-  //     return { ...prev, material_details: updatedMaterials };
-  //   });
-
-  //   // Validation
-  //   setFormErrors((prev) => ({
-  //     ...prev,
-  //     material_details:
-  //       prev.material_details?.length === 0
-  //         ? 'Please select at least one material.'
-  //         : '',
-  //   }));
-  // };
-
-  // const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const value = Number(e.target.value);
-
-  //   setFormData((prev) => {
-  //     let updatedMaterials;
-
-  //     if (prev.material_details.includes(value)) {
-  //       updatedMaterials = prev.material_details.filter((id) => id !== value);
-  //     } else {
-  //       updatedMaterials = [...prev.material_details, value];
-  //     }
-
-  //     return {
-  //       ...prev,
-  //       material_details: updatedMaterials,
-  //       remarks:
-  //         prev.status === "open"
-  //           ? `This Material is Processed on ${programDate || "N/A"}`
-  //           : prev.remarks,
-  //     };
-  //   });
-  // };
 
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {

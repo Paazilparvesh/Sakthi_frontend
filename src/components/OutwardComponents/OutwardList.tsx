@@ -1,5 +1,4 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { OutwardProps } from '@/types/inward.type';
 import { useLocation } from 'react-router-dom';

@@ -4,7 +4,6 @@ import { Toaster as Sonner } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 // React Query
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-// import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import {
   BrowserRouter,
   Routes,
@@ -31,10 +30,6 @@ import QADashboard from './pages/Dashboard_Page/QADashBoard';
 import AccountsDashboard from './pages/Dashboard_Page/AccountsDashBoard';
 
 import Unauthorized from './pages/Normal_Page/Unauthorized';
-
-// import { LicenseManager } from "ag-grid-enterprise";
-// LicenseManager.setLicenseKey(import.meta.env.VITE_AGGRID_LICENSE_KEY);
-
 
 interface ProtectedLayoutProps {
   roles?: string[];
@@ -70,7 +65,6 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          {/* <Header /> */}
           <LayoutWithConditionalHeader>
             <Routes>
               <Route path='/' element={<Navigate to='/login' replace />} />

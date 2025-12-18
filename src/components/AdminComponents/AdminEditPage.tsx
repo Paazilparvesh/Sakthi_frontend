@@ -62,7 +62,7 @@ const AdminEditPage: React.FC<EditProps> = ({ product, onCancel, onBack }) => {
 
       {/* Tabs */}
       <div className='flex justify-between gap-3 border-b pb-3 mb-4'>
-        <div className='flex items-center'>
+        <div className='flex items-center gap-2'>
           {/* Inward - always allowed */}
           <button
             className={`px-4 py-1 rounded-md ${activeTab === 'Inward'

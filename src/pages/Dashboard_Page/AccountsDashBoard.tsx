@@ -253,7 +253,6 @@ const AccountsDashboard: React.FC = () => {
                         setView("detail");
                       }}
                       getStatusColor={getStatusColor}
-                      role="accounts"
                     />
                     {/* Pagination Buttons */}
                     {totalPages > 1 && (
@@ -290,8 +289,6 @@ const AccountsDashboard: React.FC = () => {
             {view === "detail" && currentProduct && (
               <OutwardDetail
                 product={currentProduct}
-                program={filteredProgram}
-                getStatusColor={getStatusColor}
               />
             )}
 
@@ -305,7 +302,6 @@ const AccountsDashboard: React.FC = () => {
                     programMaterialMap[m.id] &&
                     String(m.acc_status).toLowerCase() === "pending"
                 )}
-                programMap={programMap}
                 onBack={() => setView("detail")}
                 onSubmitSuccess={fetchProducts}
               />

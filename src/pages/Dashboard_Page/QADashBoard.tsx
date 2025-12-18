@@ -245,7 +245,6 @@ const QADashboard: React.FC = () => {
                         setView('detail');
                       }}
                       getStatusColor={getStatusColor}
-                      role='qa'
                     />
                     {/* Pagination Buttons */}
                     {totalPages > 1 && (
@@ -282,26 +281,24 @@ const QADashboard: React.FC = () => {
             {view === 'detail' && currentProduct && (
               <OutwardDetail
                 product={currentProduct}
-                program={filteredProgram}
-                getStatusColor={getStatusColor}
               />
             )}
 
             {/* QA FORM */}
             {view === 'qaForm' && currentProduct && (
-           
+
               <QAForm
-  productId={currentProduct.id}
-  companyName={currentProduct.company_name}
-  materials={currentProduct.materials.filter(
-    (m) =>
-      programMaterialMap[m.id] &&
-      String(m.qa_status).toLowerCase() === 'pending'
-  )}
-  program_details={filteredProgram}   // ✅ FIX
-  onBack={() => setView('detail')}
-  onSubmitSuccess={fetchProducts}
-/>
+                productId={currentProduct.id}
+                companyName={currentProduct.company_name}
+                materials={currentProduct.materials.filter(
+                  (m) =>
+                    programMaterialMap[m.id] &&
+                    String(m.qa_status).toLowerCase() === 'pending'
+                )}
+                program_details={filteredProgram}   // ✅ FIX
+                onBack={() => setView('detail')}
+                onSubmitSuccess={fetchProducts}
+              />
 
             )}
 

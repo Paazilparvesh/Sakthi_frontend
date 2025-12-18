@@ -41,6 +41,21 @@ const ProgrammerEditForm: React.FC<Props> = ({
         setFormData({});
     };
 
+    const normalizeTime = (val: string | null | undefined) => {
+        if (!val) return "";
+        // if backend sends "00:40:00" -> "00:40"
+        if (/^\d{2}:\d{2}:\d{2}$/.test(val)) return val.slice(0, 5);
+        // if backend sends minutes "40" -> "00:40"
+        if (/^\d+$/.test(val)) {
+            const mins = Number(val);
+            const hh = String(Math.floor(mins / 60)).padStart(2, "0");
+            const mm = String(mins % 60).padStart(2, "0");
+            return `${hh}:${mm}`;
+        }
+        return val; // already HH:mm
+    };
+
+
     useEffect(() => {
         if (materials.length === 1 && !selectedMaterialId) {
             setSelectedMaterialId(materials[0].id);  // auto-select
@@ -142,9 +157,6 @@ const ProgrammerEditForm: React.FC<Props> = ({
         "total_piercing",
         "processed_mins_per_sheet",
         "total_planned_hours",
-
-
-
         "remarks",
     ];
 
@@ -152,10 +164,10 @@ const ProgrammerEditForm: React.FC<Props> = ({
 
     return (
 
-         <div className='space-y-6'>
-              <h3 className="text-lg font-semibold">Select Material for Programmer Update</h3>
-      <div className='flex justify-between items-center'>
-   
+        <div className='space-y-6'>
+            <h3 className="text-lg font-semibold">Select Material for Programmer Update</h3>
+            <div className='flex justify-between items-center'>
+
 
                 <select
                     value={selectedMaterialId ?? ""}
@@ -170,16 +182,18 @@ const ProgrammerEditForm: React.FC<Props> = ({
                         </option>
                     ))}
                 </select>
-                  <Button
+                {selectedMaterialId && (
+                    <Button
                         className="mt-4 bg-blue-600 text-white"
                         onClick={() => setConfirmModal(true)}
                         disabled={loading}
                     >
                         {loading ? "Updating..." : "Update Programmer"}
                     </Button>
-                
+                )}
+
             </div>
-            
+
 
             {/* ----------------- SHOW FIELDS ONLY AFTER MATERIAL SELECTED ----------------- */}
             {selectedMaterialId && (
@@ -208,10 +222,16 @@ const ProgrammerEditForm: React.FC<Props> = ({
                                                 ? "text"
                                                 : key === "program_date"
                                                     ? "date"
-                                                    : "number"
+                                                    : key === "total_planned_hours"
+                                                        ? "time"
+                                                        : "number"
                                     }
                                     name={key}
-                                    value={formData[key] || ""}
+                                    value={
+                                        key === "balance_quantity"
+                                            ? (formData[key] || "0")  // ✅ Show 0 when empty
+                                            : (formData[key] || "")
+                                    }
                                     onChange={(e) => {
                                         const value = e.target.value;
 
@@ -260,7 +280,7 @@ const ProgrammerEditForm: React.FC<Props> = ({
                     </div>
 
                     {/* ----------------- UPDATE BUTTON ----------------- */}
-                  
+
                 </div>
             )}
 
@@ -276,7 +296,7 @@ const ProgrammerEditForm: React.FC<Props> = ({
                     </p>
 
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setConfirmModal(false)}>
+                        <Button variant="outline" className="hover:bg-gray-300 hover:text-black" onClick={() => setConfirmModal(false)}>
                             Cancel
                         </Button>
                         <Button

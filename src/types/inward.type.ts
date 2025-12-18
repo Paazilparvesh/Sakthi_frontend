@@ -21,14 +21,20 @@ export interface OutwardProps {
   getStatusColor?: (status: string) => string;
 }
 export interface OutwardDetailProps {
-  product: ProductType;
+  product?: ProductType;
 }
 export interface OutwardProps {
-  productId: number;
-  companyName: string;
-  materials: Material[];
-  program_details: ProgramerDetails[];
-  onBack: () => void;
+  products?: ProductType[];  // Array of products
+  product?: ProductType[];  // Array of products
+  onView?: (product: ProductType) => void;
+  getStatusColor?: (status: string) => string;
+  detailed_product?: ProductType;
+  program?: ProgramerDetails[];
+  productId?: number;
+  companyName?: string;
+  materials?: Material[];
+  program_details?: ProgramerDetails[];
+  onBack?: () => void;
   onSubmitSuccess?: () => void;
 }
 
@@ -146,6 +152,7 @@ export interface QaDetails {
   total_cycle_time_formatted?: string;
   machines_used?: MachineLog[];
   created_by?: string;
+  created_by__username?: string;
 }
 
 export interface MachineLog {
@@ -166,6 +173,7 @@ export interface AccountDetails {
   status: string;
   remarks: string;
   created_by: string;
+  created_by__username?: string;
 
   product_details?: number;
 }
