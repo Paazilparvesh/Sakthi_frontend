@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -46,7 +45,7 @@ const ProgrammerEditForm: React.FC<Props> = ({
         if (materials.length === 1 && !selectedMaterialId) {
             setSelectedMaterialId(materials[0].id);  // auto-select
         }
-    }, [materials, selectedMaterialId]);
+    }, [materials, selectedMaterialId, setSelectedMaterialId]);
 
     /* ---------------------------------------------
         LOAD PROGRAMMER DETAILS WHEN MATERIAL CHANGES
@@ -82,7 +81,7 @@ const ProgrammerEditForm: React.FC<Props> = ({
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
 
-        setFormData((prev: any) => ({
+        setFormData((prev) => ({
             ...prev,
             [name]: value,
         }));
@@ -207,7 +206,7 @@ const ProgrammerEditForm: React.FC<Props> = ({
 
                                         // Remarks: full text allowed
                                         if (key === "remarks") {
-                                            setFormData((prev: any) => ({
+                                            setFormData((prev) => ({
                                                 ...prev,
                                                 [key]: value,
                                             }));
@@ -217,7 +216,7 @@ const ProgrammerEditForm: React.FC<Props> = ({
                                         // program_no: alphanumeric allowed
                                         if (key === "program_no") {
                                             const cleanedValue = value.replace(/[^a-zA-Z0-9 -]/g, "");
-                                            setFormData((prev: any) => ({
+                                            setFormData((prev) => ({
                                                 ...prev,
                                                 [key]: cleanedValue,
                                             }));
@@ -226,7 +225,7 @@ const ProgrammerEditForm: React.FC<Props> = ({
 
                                         // program_date: save directly (date input)
                                         if (key === "program_date") {
-                                            setFormData((prev: any) => ({
+                                            setFormData((prev) => ({
                                                 ...prev,
                                                 [key]: value,
                                             }));
@@ -235,7 +234,7 @@ const ProgrammerEditForm: React.FC<Props> = ({
 
                                         // For other fields => numbers only
                                         const cleanedValue = value.replace(/[^0-9.]/g, "");
-                                        setFormData((prev: any) => ({
+                                        setFormData((prev) => ({
                                             ...prev,
                                             [key]: cleanedValue,
                                         }));
