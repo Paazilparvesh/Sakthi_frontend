@@ -172,7 +172,7 @@ export interface AccountDetails {
 
 export interface EditProps {
   product: ProductType;
-  onCancel: () => void;
-  onBack: () => void;
+  onCancel?: () => void;
+  onBack?: () => void;
   updateForm?: (partial: Partial<ProductType>) => void;
 }

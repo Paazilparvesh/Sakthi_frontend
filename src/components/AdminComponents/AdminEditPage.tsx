@@ -28,7 +28,7 @@ const AdminEditPage: React.FC<EditProps> = ({ product, onCancel, onBack }) => {
   const renderTab = () => {
     switch (activeTab) {
       case 'Inward':
-        return <InwardEditForm form={form} updateForm={updateForm} />;
+        return <InwardEditForm product={form} updateForm={updateForm} />;
 
       case 'Programmer': {
         return (
@@ -66,8 +66,8 @@ const AdminEditPage: React.FC<EditProps> = ({ product, onCancel, onBack }) => {
           {/* Inward - always allowed */}
           <button
             className={`px-4 py-1 rounded-md ${activeTab === 'Inward'
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              ? 'bg-blue-600 text-white'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             onClick={() => {
               setActiveTab('Inward');
@@ -81,10 +81,10 @@ const AdminEditPage: React.FC<EditProps> = ({ product, onCancel, onBack }) => {
           <button
             disabled={!canEditProgrammer}
             className={`px-4 py-1 rounded-md ${!canEditProgrammer
-                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                : activeTab === 'Programmer'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+              : activeTab === 'Programmer'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             onClick={() => {
               if (!canEditProgrammer) return;
@@ -99,10 +99,10 @@ const AdminEditPage: React.FC<EditProps> = ({ product, onCancel, onBack }) => {
           <button
             disabled={!canEditQa || !canEditProgrammer}
             className={`px-4 py-1 rounded-md ${!canEditQa || !canEditProgrammer
-                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                : activeTab === 'QA'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+              : activeTab === 'QA'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             onClick={() => {
               if (!canEditQa || !canEditProgrammer) return;

@@ -13,6 +13,8 @@ import {
 const API_URL = import.meta.env.VITE_API_URL;
 
 const InwardEditForm: React.FC<EditProps> = ({ product, updateForm }) => {
+
+    
     const [loading, setLoading] = useState(false);
     const [materialList, setMaterialList] = useState<Density[]>([]);
 
@@ -20,6 +22,7 @@ const InwardEditForm: React.FC<EditProps> = ({ product, updateForm }) => {
     const [resultModal, setResultModal] = useState(false); // success/fail modal
     const [updated, setUpdated] = useState<"success" | "failed" | "idle">("idle");
     const [attempts, setAttempts] = useState(0);
+
 
     /* -------------------------------------------------------------
      * Fetch Material Densities (same logic as InwardTable)
@@ -177,6 +180,12 @@ const InwardEditForm: React.FC<EditProps> = ({ product, updateForm }) => {
 
         setLoading(false);
     };
+
+            // Early return if no product data
+    if (!product || !product.serial_number) {
+        return <div>Loading product data...</div>;
+    }
+
 
     /* -------------------------------------------------------------
      * UI
