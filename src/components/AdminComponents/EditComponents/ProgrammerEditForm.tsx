@@ -152,10 +152,12 @@ const ProgrammerEditForm: React.FC<Props> = ({
     const label = (key: string) => key.replace(/_/g, " ").toUpperCase();
 
     return (
-        <div className="space-y-6">
-            <h3 className="text-lg font-semibold">Select Material for Programmer Update</h3>
-            {/*  MATERIAL DROPDOWN */}
-            <div className="flex flex-col space-y-1.5 w-full md:w-1/3">
+
+         <div className='space-y-6'>
+              <h3 className="text-lg font-semibold">Select Material for Programmer Update</h3>
+      <div className='flex justify-between items-center'>
+   
+
                 <select
                     value={selectedMaterialId ?? ""}
                     onChange={handleMaterialChange}
@@ -169,7 +171,16 @@ const ProgrammerEditForm: React.FC<Props> = ({
                         </option>
                     ))}
                 </select>
+                  <Button
+                        className="mt-4 bg-blue-600 text-white"
+                        onClick={() => setConfirmModal(true)}
+                        disabled={loading}
+                    >
+                        {loading ? "Updating..." : "Update Programmer"}
+                    </Button>
+                
             </div>
+            
 
             {/* ----------------- SHOW FIELDS ONLY AFTER MATERIAL SELECTED ----------------- */}
             {selectedMaterialId && (
@@ -250,13 +261,7 @@ const ProgrammerEditForm: React.FC<Props> = ({
                     </div>
 
                     {/* ----------------- UPDATE BUTTON ----------------- */}
-                    <Button
-                        className="mt-4 bg-green-600 text-white"
-                        onClick={() => setConfirmModal(true)}
-                        disabled={loading}
-                    >
-                        {loading ? "Updating..." : "Update Programmer"}
-                    </Button>
+                  
                 </div>
             )}
 
@@ -276,7 +281,7 @@ const ProgrammerEditForm: React.FC<Props> = ({
                             Cancel
                         </Button>
                         <Button
-                            className="bg-green-600"
+                            className="bg-blue-600"
                             onClick={() => {
                                 setConfirmModal(false);
                                 handleUpdate();

@@ -289,18 +289,20 @@ const QADashboard: React.FC = () => {
 
             {/* QA FORM */}
             {view === 'qaForm' && currentProduct && (
+           
               <QAForm
-                productId={currentProduct.id}
-                companyName={currentProduct.company_name}
-                materials={currentProduct.materials.filter(
-                  (m) =>
-                    programMaterialMap[m.id] &&
-                    String(m.qa_status).toLowerCase() === 'pending'
-                )}
-                program={filteredProgram}
-                onBack={() => setView('detail')}
-                onSubmitSuccess={fetchProducts}
-              />
+  productId={currentProduct.id}
+  companyName={currentProduct.company_name}
+  materials={currentProduct.materials.filter(
+    (m) =>
+      programMaterialMap[m.id] &&
+      String(m.qa_status).toLowerCase() === 'pending'
+  )}
+  program_details={filteredProgram}   // ✅ FIX
+  onBack={() => setView('detail')}
+  onSubmitSuccess={fetchProducts}
+/>
+
             )}
 
           </CardContent>

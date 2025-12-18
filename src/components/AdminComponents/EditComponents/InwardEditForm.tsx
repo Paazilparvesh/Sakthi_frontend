@@ -197,7 +197,7 @@ const InwardEditForm: React.FC<EditProps> = ({ product, updateForm }) => {
                 <h2 className="text-2xl font-semibold text-gray-800">Edit Inward Product Details</h2>
 
                 <Button
-                    className="bg-green-600 text-white"
+                    className="bg-blue-600 text-white"
                     onClick={() => setConfirmModal(true)}
                     disabled={loading}
                 >
@@ -514,12 +514,12 @@ const InwardEditForm: React.FC<EditProps> = ({ product, updateForm }) => {
                     </p>
 
                     <DialogFooter className="flex justify-end gap-3 mt-4">
-                        <Button variant="outline" onClick={() => setConfirmModal(false)}>
+                        <Button onClick={() => setConfirmModal(false)}>
                             Cancel
                         </Button>
 
                         <Button
-                            className="bg-green-600 text-white"
+                            className="bg-blue-600 text-white"
                             onClick={() => {
                                 setConfirmModal(false);
                                 handleInwardUpdate();

@@ -57,7 +57,7 @@ const AdminEditPage: React.FC<EditProps> = ({ product, onCancel, onBack }) => {
   };
 
   return (
-    <Card className='border-none'>
+    <Card className='border-0 shadow-none'>
       <h2 className='text-2xl font-bold mb-6'>Edit Product</h2>
 
       {/* Tabs */}
